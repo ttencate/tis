@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
       h = 22,
       s = w*h,
       // I J L O S T Z
-      backgroundLUT = '#080808 #0dd #44f #e80 #ee0 #0e0 #a0a #f22'.split(' '),
+      backgroundLUT = '#080808 #0dd #36f #e80 #dd0 #0e0 #c0c #f22 #002c2c #0a1433 #301b00 #2c2c00 #003000 #290029 #330707'.split(' '),
       // http://tetris.wikia.com/wiki/SRS
       //     1     2     4     8
       //    16    32    64   128
@@ -47,16 +47,22 @@ document.addEventListener('DOMContentLoaded', function() {
     gridElts[i] = document.getElementById('tis-' + i);
   }
 
+  function isSolidAt(x, y, rotation) {
+    return currentTetromino &&
+      //(x&15) == x && (y&15) == y && // range check for [0, 16)
+      x >= 0 && x < 4 && y >= 0 && y < 4 &&
+      (shapes[currentTetromino][rotation] & (1 << (4 * y + x)));
+  }
+
   function render() {
-    // TODO show ghost piece
+    for (tmp = currentY; currentTetromino && !isBlocked(currentX, tmp+1, currentRotation); tmp++);
     for (y = 0; y < h; y++)
       for (x = 0; x < w; x++) {
         i = y*w + x;
-        shadowGrid[i] = (currentTetromino &&
-            x >= currentX && x < currentX+4 &&
-            y >= currentY && y < currentY+4 &&
-            (shapes[currentTetromino][currentRotation] & (1 << (4 * (y-currentY) + (x-currentX))))) ?
-            currentTetromino : grid[i] || 0;
+        shadowGrid[i] =
+          isSolidAt(x-currentX, y-currentY, currentRotation) ? currentTetromino :
+          isSolidAt(x-currentX, y-tmp, currentRotation) ? currentTetromino + 7 :
+          grid[i] || 0;
         if (gridElts[i])
           gridElts[i].style.background = backgroundLUT[shadowGrid[i]];
       }
@@ -64,16 +70,12 @@ document.addEventListener('DOMContentLoaded', function() {
     statusElt.innerHTML = 'Score' + tmp + score + '</div>Lines' + tmp + lines + '</div>Level' + tmp + level + '</div>';
   }
 
-  function isBlocked(posX, posY, rotation, shape) {
-    for (y = 0; y < 4; y++)
-      for (x = 0; x < 4; x++) {
-        rx = posX + x;
-        ry = posY + y;
-        if (shapes[currentTetromino][rotation] & (1 << (4*y + x)) &&
-            (rx < 0 || rx >= w || ry < 0 || ry >= h || grid[ry*w + rx])) {
+  function isBlocked(posX, posY, rotation) {
+    for (y = posY; y < posY+4; y++)
+      for (x = posX; x < posX+4; x++)
+        if (isSolidAt(x-posX, y-posY, rotation) &&
+            (x < 0 || x >= w || y < 0 || y >= h || grid[y*w + x]))
           return 1;
-        }
-      }
     return 0;
   }
 
@@ -107,6 +109,8 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         }
         if (tmp) {
+          // Clear line
+          // TODO animation
           tmp2++;
           for (i = y*w+w-1; i >= 0; i--) {
             grid[i] = grid[i-w];
@@ -147,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     render();
-    window.setTimeout(tick, 1000 / (level + 1));
+    window.setTimeout(tick, 1500 / (level + 1));
   }
   tick();
 
@@ -169,6 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
       case 40: // down
         // Soft drop
         if (!isBlocked(currentX, currentY + 1, currentRotation)) currentY++;
+        break;
       case 90: // z
       case 186: // ; (dvorak)
         // TODO wall kicks
