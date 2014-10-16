@@ -6,7 +6,7 @@
 # $ npm install uglify-js
 
 function minify() {
-  `npm bin`/uglifyjs --unsafe --lift-vars < tis.js > tis.min.js && \
+  `npm bin`/uglifyjs --lint --compress --mangle < tis.js > tis.min.js && \
     echo -n 'Byte count: ' && \
     wc -c < tis.min.js
 }
