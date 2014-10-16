@@ -4,21 +4,28 @@ document.addEventListener('DOMContentLoaded', function() {
   var gridElt = document.getElementById('tis-grid'),
       gridElts = [],
       statusElt,
-      // http://newt.phys.unsw.edu.au/jw/notes.html
+      // http://www.theoreticallycorrect.com/Helmholtz-Pitch-Numbering/
       //
-      // Subtract 64, then:
-      // - bits 0-3 are MIDI note number - 68 (G#, lowest note in the tune)
-      // - bits 4-5 are duration: eighth, dotted quarter, quarter, half
+      // Lowest note in treble: 60
+      // Highest note in treble: 83
       //
-      //         1/8 3/8 1/4 1/2
-      // G# =  0  @   P   `   p
-      // A  =  1  A   Q   a   q
-      // Bb =  2  B   R   b   r
-      // ...                 
-      // A5 = 13  M   ]   m   }
+      // Subtract 32, then:
+      // - % 24 gives MIDI note number minus 60
+      // - / 24 gives duration: eighth, dotted quarter, quarter, half
+      // 
+      // Other way:
+      // note number - 28 + 24 * [0:eighth, 1:dotted quarter, 2:quarter, 3:half]
       //
       // http://i.ytimg.com/vi/bpBePVCUM7E/maxresdefault.jpg
-      music = 'hCDfDCaADhFDSDfhdaQDVImKIXDhFDcCDfhdaq',
+      // https://www.youtube.com/watch?v=IBkH5_gLF8Q
+      treble = [
+        '`+,^,+Y),`.,C,^`\\Yq^.1e31H,01.,C,^`\\Yq',
+        'T$$T,+)$),Y))<$TTYTl.).1^..D,\\.,<$TTTTT`'
+      ],
+      // All notes are eighths.
+      // Subtract 64 to get MIDI note number - 33.
+      bass = 'GNKNGNKNLSOSLSOSKSNSKSNSLSNSL@BCESOSESOSCOCOCOCOBNBN?J?J@CGL@@@@',
+      bass2 = 'LSOSLSOSKSNSKSNSLSOSLSOSKSNSKSNS',
       grid = [],
       shadowGrid = [],
       w = 10,
@@ -57,7 +64,9 @@ document.addEventListener('DOMContentLoaded', function() {
       lastFrame,
       i, j, x, y, tmp, tmp2, tmp3
       ;
-  music = music + music + 'xtvstqpsxtvsdh}|';
+  treble[0] = treble[0] + treble[0] + 'xtvstqpsxtvs\\`}|x';
+  treble[1] = treble[1] + treble[1] + 'tqspqqpptqspY`xx\u007f';
+  bass = bass + bass + bass2 + bass2;
 
   for (i = 0; i < s; i++) {
     grid.push(0);
@@ -67,10 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Music!
-  // Tempo: 144 bpm, 4/4, 24 bars -> 40 seconds
-  // TODO bassline
-  // TODO fix looping plops
-  tmp2 = 40*22050;
+  tmp2 = 881856; // 4593 samples/eighth * 8 eighths/bar * 24 bars
   tmp = new Uint8Array(tmp2 + 44);
   // https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
   tmp.set([
@@ -90,14 +96,25 @@ document.addEventListener('DOMContentLoaded', function() {
     0x64, 0x61, 0x74, 0x61, // "data"
     tmp2 & 0xFF, (tmp2 >> 8) & 0xff, tmp2 >> 16, 0 // data size
   ]);
-  for (i = 44, j = 0; j < music.length; j++) {
-    tmp3 = music.charCodeAt(j) - 64;
-    x = 2 * Math.PI * 440 * Math.pow(2, (tmp3 & 15) / 12) / 22050;
-    j > 75 && (x /= 2);
-    tmp2 = j > 75 ? 0.8 : 1;
-    for (y = 0; y < [4593, 13781, 9187, 18375][tmp3 >> 4]; y++) {
-      tmp[i++] = tmp2 * (Math.sin(y * x) > 0 ? 255 : 0) + (1-tmp2) * 127;
-      tmp2 *= j > 75 ? 0.99997 : 0.9999;
+  // delta is treble voice index
+  for (delta = 0; delta < 2; delta++) {
+    for (i = 44, j = 0; j < treble[delta].length; j++) {
+      tmp3 = treble[delta].charCodeAt(j) - 32;
+      x = 2 * Math.PI * 261.63 * Math.pow(2, (tmp3 % 24) / 12) / 22050;
+      tmp2 = 0.2 - 0.1 * delta;
+      for (y = 0; y < 4593 * [1, 3, 2, 4][Math.floor(tmp3 / 24)]; y++) {
+        tmp[i++] += 127 * ((1-delta) + tmp2 * (Math.sin(y * x) > 0 ? 1 : -1));
+        tmp2 *= 0.9999;
+      }
+    }
+  }
+  for (i = 44, j = 0; j < bass.length; j++) {
+    tmp3 = bass.charCodeAt(j) - 64;
+    x = 2 * Math.PI * 55 * Math.pow(2, tmp3 / 12) / 22050;
+    tmp2 = 0.1;
+    for (y = 0; y < 4593; y++) {
+      tmp[i++] += 127 * tmp2 * (Math.sin(y * x) > 0 ? 1 : -1);
+      tmp2 *= 0.9999;
     }
   }
   document.body.innerHTML += '<audio id="tis-music" src="' + URL.createObjectURL(new Blob([tmp], {type: 'audio/wav'})) + '" loop' + (location.hash == '#m' ? '' : ' autoplay') + '></audio>';
@@ -221,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         gravityTimer += Math.max(
             keysPressed[40] ? 0.2 : 0,
+            // TODO tune speed (use spreadsheet?)
             delta * (level+1) / 1500);
         if (gravityTimer > 1) {
           gravityTimer = 0;
