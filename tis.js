@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Music!
   // Tempo: 144 bpm, 4/4, 24 bars -> 40 seconds
   // TODO bassline
+  // TODO fix looping plops
   tmp2 = 40*22050;
   tmp = new Uint8Array(tmp2 + 44);
   // https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
