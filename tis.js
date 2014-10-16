@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+  // TODO create all HTML in one go so our elements don't get recreated
   document.body.innerHTML += '<div id="tis-root" style="position:fixed;width:280px;height:400px;left:50%;top:50%;margin:-240px -160px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px;padding:40px"><div id="tis-grid" style="background:#000;width:200px;height:400px;box-shadow:0 0 10px #222;"></div><div id="tis-status" style="position:absolute;right:20px;top:40px;width:80px;color:#eee;font:normal 15px sans-serif"></div></div>';
   var gridElt = document.getElementById('tis-grid'),
       gridElts = [],
@@ -99,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
       tmp2 *= j > 75 ? 0.99997 : 0.9999;
     }
   }
-  document.body.innerHTML += '<audio id="tis-music" src="' + URL.createObjectURL(new Blob([tmp], {type: 'audio/wav'})) + '" autoplay loop></audio>';
+  document.body.innerHTML += '<audio id="tis-music" src="' + URL.createObjectURL(new Blob([tmp], {type: 'audio/wav'})) + '" loop' + (location.hash == '#m' ? '' : ' autoplay') + '></audio>';
  
   // Modifying document.innerHTML replaces the entire body, so pick up elements
   // at a late stage.
@@ -258,7 +259,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (isBlocked(currentX, currentY, currentRotation)) {
               // Game over
-              document.removeEventListener('keydown', onKeyDown);
               state = 1;
               fillRows = h;
             }
