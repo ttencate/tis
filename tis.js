@@ -43,8 +43,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   for (i = 0; i < s; i++) {
     grid.push(0);
-    if (i > 19)
+    if (i > 19) {
       gridElt.innerHTML += '<div id="tis-' + i + '" style="width:20px;height:20px;float:left;box-shadow:-2px -2px 8px rgba(0,0,0,0.4) inset, 0 0 2px #000 inset;"></div>';
+    }
   }
   // No idea why we need a separate loop. But it breaks otherwise.
   for (i = 20; i < s; i++) {
@@ -60,27 +61,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function render() {
     for (tmp = currentY; currentTetromino && !isBlocked(currentX, tmp+1, currentRotation); tmp++);
-    for (y = 0; y < h; y++)
+    for (y = 0; y < h; y++) {
       for (x = 0; x < w; x++) {
         i = y*w + x;
         shadowGrid[i] =
           isSolidAt(x-currentX, y-currentY, currentRotation) ? currentTetromino :
           isSolidAt(x-currentX, y-tmp, currentRotation) ? currentTetromino + 7 :
           grid[i] || 0;
-        if (gridElts[i])
+        if (gridElts[i]) {
           gridElts[i].style.background = backgroundLUT[shadowGrid[i]];
+        }
       }
+    }
     tmp = '<div style="text-align:right;font-size:150%">';
     statusElt.innerHTML = 'Score' + tmp + score + '</div>Lines' + tmp + lines + '</div>Level' + tmp + level + '</div>';
   }
 
   // XXX can probably shrink this by doing tryMove(dx, dy, dr) instead
   function isBlocked(posX, posY, rotation) {
-    for (y = posY; y < posY+4; y++)
-      for (x = posX; x < posX+4; x++)
+    for (y = posY; y < posY+4; y++) {
+      for (x = posX; x < posX+4; x++) {
         if (isSolidAt(x-posX, y-posY, rotation) &&
-            (x < 0 || x >= w || y < 0 || y >= h || grid[y*w + x]))
+            (x < 0 || x >= w || y < 0 || y >= h || grid[y*w + x])) {
           return 1;
+        }
+      }
+    }
     return 0;
   }
 
@@ -88,7 +94,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Shuffle bag if needed
     // TODO show next piece
     if (!bag.length) {
-      for (i = 0; i < 7; i++) bag[i] = i+1;
+      for (i = 0; i < 7; i++) {
+        bag[i] = i+1;
+      }
       for (i = 0; i < 7; i++) {
         j = Math.floor(Math.random() * 7);
         tmp = bag[j]; bag[j] = bag[i]; bag[i] = tmp;
@@ -110,8 +118,9 @@ document.addEventListener('DOMContentLoaded', function() {
     switch (state) {
       case 1:
         if (lost > 1) {
-          for (x = 0; x < w; x++)
+          for (x = 0; x < w; x++) {
             grid[lost*w + x] = 1 + Math.floor(Math.random() * 7);
+          }
           render();
           lost--;
         }
@@ -156,9 +165,9 @@ document.addEventListener('DOMContentLoaded', function() {
             delta * (level+1) / 1500);
         if (gravityTimer > 1) {
           gravityTimer = 0;
-          if (!isBlocked(currentX, currentY + 1, currentRotation))
+          if (!isBlocked(currentX, currentY + 1, currentRotation)) {
             currentY++;
-          else {
+          } else {
             // Lock it in place
             // TODO lock delay
             render();
@@ -204,8 +213,9 @@ document.addEventListener('DOMContentLoaded', function() {
   frame(0);
 
   function onKeyDown(e) {
-    if (!keysPressed[e.keyCode])
+    if (!keysPressed[e.keyCode]) {
       keysPressed[e.keyCode] = 0;
+    }
   }
   function onKeyUp(e) {
     delete keysPressed[e.keyCode];
