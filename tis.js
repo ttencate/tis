@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-  document.write('<div id="tis-root" style="position:fixed;width:280px;height:400px;left:50%;top:50%;margin:-240px -160px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px;padding:40px"><div id="tis-grid" style="background:#000;width:200px;height:400px;box-shadow:0 0 10px #222;"></div><div id="tis-status" style="position:absolute;right:20px;top:40px;width:80px;color:#eee;font:normal 15px sans-serif"></div></div>');
+  document.body.innerHTML += '<div id="tis-root" style="position:fixed;width:280px;height:400px;left:50%;top:50%;margin:-240px -160px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px;padding:40px"><div id="tis-grid" style="background:#000;width:200px;height:400px;box-shadow:0 0 10px #222;"></div><div id="tis-status" style="position:absolute;right:20px;top:40px;width:80px;color:#eee;font:normal 15px sans-serif"></div></div>';
   var gridElt = document.getElementById('tis-grid'),
       gridElts = [],
       statusElt = document.getElementById('tis-status'),
@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
       currentY,
       currentRotation,
       state = 0, // 0=PLAYING, 1=LOST
+      fillRows,
       score = 0,
       lines = 0,
       level = 1,
@@ -38,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
       keysPressed = [],
       delta,
       lastFrame,
-      i, x, y, rx, ry, tmp, tmp2
+      i, j, x, y, tmp, tmp2
       ;
 
   for (i = 0; i < s; i++) {
@@ -117,12 +118,12 @@ document.addEventListener('DOMContentLoaded', function() {
     lastFrame = now;
     switch (state) {
       case 1:
-        if (lost > 1) {
+        if (fillRows > 1) {
           for (x = 0; x < w; x++) {
-            grid[lost*w + x] = 1 + Math.floor(Math.random() * 7);
+            grid[fillRows*w + x] = 1 + Math.floor(Math.random() * 7);
           }
           render();
-          lost--;
+          fillRows--;
         }
         break;
 
@@ -201,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (isBlocked(currentX, currentY, currentRotation)) {
               // Game over
               document.removeEventListener('keydown', onKeyDown);
-              lost = h;
+              fillRows = h;
             }
           }
           render();
