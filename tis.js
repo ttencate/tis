@@ -2,7 +2,22 @@ document.addEventListener('DOMContentLoaded', function() {
   document.body.innerHTML += '<div id="tis-root" style="position:fixed;width:280px;height:400px;left:50%;top:50%;margin:-240px -160px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px;padding:40px"><div id="tis-grid" style="background:#000;width:200px;height:400px;box-shadow:0 0 10px #222;"></div><div id="tis-status" style="position:absolute;right:20px;top:40px;width:80px;color:#eee;font:normal 15px sans-serif"></div></div>';
   var gridElt = document.getElementById('tis-grid'),
       gridElts = [],
-      statusElt = document.getElementById('tis-status'),
+      statusElt,
+      // http://newt.phys.unsw.edu.au/jw/notes.html
+      //
+      // Subtract 64, then:
+      // - bits 0-3 are MIDI note number - 68 (G#, lowest note in the tune)
+      // - bits 4-5 are duration: eighth, dotted quarter, quarter, half
+      //
+      //         1/8 3/8 1/4 1/2
+      // G# =  0  @   P   `   p
+      // A  =  1  A   Q   a   q
+      // Bb =  2  B   R   b   r
+      // ...                 
+      // A5 = 13  M   ]   m   }
+      //
+      // http://i.ytimg.com/vi/bpBePVCUM7E/maxresdefault.jpg
+      music = 'hCDfDCaADhFDSDfhdaQDVImKIXDhFDcCDfhdaq',
       grid = [],
       shadowGrid = [],
       w = 10,
@@ -16,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
       //   256   512  1024  2048
       //  4096  8192 16384 32768
       shapes = [
-        ,
+        , // empty
         [240, 17476, 3840, 8738], // I
         [113, 550, 1136, 802], // J
         [116, 1570, 368, 547], // L
@@ -39,8 +54,9 @@ document.addEventListener('DOMContentLoaded', function() {
       keysPressed = [],
       delta,
       lastFrame,
-      i, j, x, y, tmp, tmp2
+      i, j, x, y, tmp, tmp2, tmp3
       ;
+  music = music + music + 'xtvstqpsxtvsdh}|';
 
   for (i = 0; i < s; i++) {
     grid.push(0);
@@ -48,7 +64,45 @@ document.addEventListener('DOMContentLoaded', function() {
       gridElt.innerHTML += '<div id="tis-' + i + '" style="width:20px;height:20px;float:left;box-shadow:-2px -2px 8px rgba(0,0,0,0.4) inset, 0 0 2px #000 inset;"></div>';
     }
   }
-  // No idea why we need a separate loop. But it breaks otherwise.
+
+  // Music!
+  // Tempo: 144 bpm, 4/4, 24 bars -> 40 seconds
+  // TODO bassline
+  tmp2 = 40*22050;
+  tmp = new Uint8Array(tmp2 + 44);
+  // https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
+  tmp.set([
+    0x52, 0x49, 0x46, 0x46, // "RIFF"
+    (tmp2 + 36) & 0xff, ((tmp2 + 36) >> 8) & 0xff, ((tmp2 + 36) >> 16), 0, // data size + 36 (little-endian)
+    0x57, 0x41, 0x56, 0x45, // "WAVE"
+    
+    0x66, 0x6d, 0x74, 0x20, // "fmt "
+    16, 0, 0, 0, // size of this subchunk
+    1, 0, // PCM
+    1, 0, // mono
+    34, 86, 0, 0, // sample rate: 22050 Hz
+    34, 86, 0, 0, // byte rate: 22050 bytes/s
+    1, 0, // block align
+    8, 0, // bits per sample
+
+    0x64, 0x61, 0x74, 0x61, // "data"
+    tmp2 & 0xFF, (tmp2 >> 8) & 0xff, tmp2 >> 16, 0 // data size
+  ]);
+  for (i = 44, j = 0; j < music.length; j++) {
+    tmp3 = music.charCodeAt(j) - 64;
+    x = 2 * Math.PI * 440 * Math.pow(2, (tmp3 & 15) / 12) / 22050;
+    j > 75 && (x /= 2);
+    tmp2 = j > 75 ? 0.8 : 1;
+    for (y = 0; y < [4593, 13781, 9187, 18375][tmp3 >> 4]; y++) {
+      tmp[i++] = tmp2 * (Math.sin(y * x) > 0 ? 255 : 0) + (1-tmp2) * 127;
+      tmp2 *= j > 75 ? 0.99997 : 0.9999;
+    }
+  }
+  document.body.innerHTML += '<audio id="tis-music" src="' + URL.createObjectURL(new Blob([tmp], {type: 'audio/wav'})) + '" autoplay loop></audio>';
+ 
+  // Modifying document.innerHTML replaces the entire body, so pick up elements
+  // at a late stage.
+  statusElt = document.getElementById('tis-status');
   for (i = 20; i < s; i++) {
     gridElts[i] = document.getElementById('tis-' + i);
   }
@@ -110,6 +164,8 @@ document.addEventListener('DOMContentLoaded', function() {
     currentY = 0;
     currentRotation = 0;
     gravityTimer = 0;
+
+    render();
   }
   spawn();
 
@@ -202,6 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (isBlocked(currentX, currentY, currentRotation)) {
               // Game over
               document.removeEventListener('keydown', onKeyDown);
+              state = 1;
               fillRows = h;
             }
           }
@@ -214,9 +271,14 @@ document.addEventListener('DOMContentLoaded', function() {
   frame(0);
 
   function onKeyDown(e) {
+    if (e.keyCode == 77) {
+      tmp = document.getElementById('tis-music');
+      if (tmp.paused) tmp.play(); else tmp.pause();  
+    }
     if (!keysPressed[e.keyCode]) {
       keysPressed[e.keyCode] = 0;
     }
+    // TODO preventDefault()
   }
   function onKeyUp(e) {
     delete keysPressed[e.keyCode];
