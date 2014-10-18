@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+  // TODO Konami code launcher
   var
       doc = document,
       getElementById = 'getElementById',
@@ -88,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
       lastFrame,
       i, j, x, y, tmp, tmp2, tmp3, tmp4,
       // TODO instructions, credits
-      html = '<div id="tis-root" style="position:fixed;width:280px;height:400px;left:50%;top:50%;margin:-240px -160px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px;padding:40px"><div id="tis-grid" style="background:#000;width:200px;height:400px;box-shadow:0 0 9px #222;">'
+      html = '<div style="position:fixed;width:280px;height:400px;left:50%;top:50%;margin:-240px -160px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px;padding:40px"><div style="background:#000;width:200px;height:400px;box-shadow:0 0 9px #222;">'
       ;
 
   tmp2 = '" style="width:20px;height:20px;float:left;box-shadow:-2px -2px 8px rgba(0,0,0,0.4) inset, 0 0 2px #000 inset;"></div>';
