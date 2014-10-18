@@ -163,13 +163,15 @@ document.addEventListener('DOMContentLoaded', function() {
   function spawn() {
     // Shuffle bag if needed
     // TODO show next piece
-    if (!bag.length) {
+    if (bag.length < 2) {
+      tmp = 1;
       for (i = 0; i < 7; i++) {
-        bag[i] = i+1;
-      }
-      for (i = 0; i < 7; i++) {
-        j = Math.floor(Math.random() * 7);
-        tmp = bag[j]; bag[j] = bag[i]; bag[i] = tmp;
+        j = 0;
+        while (tmp & (1 << j)) {
+          j = Math.ceil(Math.random() * 7);
+        }
+        tmp |= 1 << j;
+        bag.push(j);
       }
     }
 
