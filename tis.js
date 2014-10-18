@@ -88,11 +88,28 @@ document.addEventListener('DOMContentLoaded', function() {
       delta,
       lastFrame,
       i, j, x, y, tmp, tmp2, tmp3, tmp4,
-      // TODO instructions, credits
-      html = '<div style="position:fixed;width:280px;height:400px;left:50%;top:50%;margin:-240px -160px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px;padding:40px"><div style="background:#000;width:200px;height:400px;box-shadow:0 0 9px #222;">'
+      html =
+        '<div style="position:fixed;width:360px;left:50%;top:50%;margin:-270px -180px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px">' +
+          '<div style="margin:20px 40px;font-size:80%;color:#888">' +
+            '<b><a href="http://github.com/ttencate/tis" style="color:inherit">Tis</a></b>: 4 kB of JavaScript<br><br>' +
+            'Left/right: move | Z/X: rotate<br>' +
+            'Down: soft drop | Up: hard drop | M: music' +
+          '</div>' +
+          '<div style="float:right;margin:0 20px;width:80px;color:#eee;font:15px sans-serif">' +
+            '<div id="tis-status"></div>' +
+            'Next<div style="margin:8px 0;height:40px;box-shadow:0 0 9px #000;">'
       ;
 
   tmp2 = '" style="width:20px;height:20px;float:left;box-shadow:-2px -2px 8px rgba(0,0,0,0.4) inset, 0 0 2px #000 inset;"></div>';
+  for (i = 220; i < s; i++) {
+    if (i % w < 4) {
+      html += '<div id="tis-' + i + tmp2;
+    }
+  }
+  html +=   '</div>' +
+          '</div>' +
+          '<div style="background:#000;width:200px;height:400px;box-shadow:0 0 9px #222;margin:0 40px 40px">';
+
   for (i = 0; i < s; i++) {
     grid.push(0);
     if (i > 19 && i < 220) {
@@ -100,13 +117,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  html += '</div><div style="position:absolute;right:20px;top:40px;width:80px;color:#eee;font:normal 15px sans-serif"><div id="tis-status"></div>Next<div style="margin:8px 0;height:40px;box-shadow:0 0 9px #000;">';
-  for (i = 220; i < s; i++) {
-    if (i % w < 4) {
-      html += '<div id="tis-' + i + tmp2;
-    }
-  }
-  html += '</div></div></div>';
+  html += '</div>' +
+        '</div>';
+  tmp = doc.createElement('div');
+  tmp.innerHTML = html;
+  doc.body.appendChild(tmp);
 
   // Music!
   tmp2 = 881856; // 4593 samples/eighth * 8 eighths/bar * 24 bars
@@ -147,10 +162,6 @@ document.addEventListener('DOMContentLoaded', function() {
   music.src = URL.createObjectURL(new Blob([tmp], {type: 'audio/wav'}));
   music.loop = 1;
   if (location.hash != '#m') music.play();
-
-  tmp = doc.createElement('div');
-  tmp.innerHTML = html;
-  doc.body.appendChild(tmp);
 
   function isSolidAt(x, y, rotation, tetromino) {
     return currentTetromino &&
