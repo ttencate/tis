@@ -22,11 +22,12 @@ document.addEventListener('DOMContentLoaded', function() {
       // Subtract 64 to get MIDI note number - 33.
       bass = 'GNKNGNKNLSOSLSOSKSNSKSNSLSNSL@BCESOSESOSCOCOCOCOBNBN?J?J@CGL@@@@',
       bass2 = 'LSOSLSOSKSNSKSNSLSOSLSOSKSNSKSNS',
+      // First 2 invisible lines, then 20 visible lines, then 4 for the Next display.
       grid = [],
       shadowGrid = [],
       w = 10,
       h = 22,
-      s = w*h,
+      s = w*h+40,
       // I J L O S T Z
       backgroundLUT = '#080808 #0dd #36f #e80 #dd0 #0e0 #c0c #f22 #002c2c #0a1433 #301b00 #2c2c00 #003000 #290029 #330707'.split(' '),
       // http://tetris.wikia.com/wiki/SRS
@@ -66,14 +67,21 @@ document.addEventListener('DOMContentLoaded', function() {
   treble[1] = treble[1] + treble[1] + 'tqspqqpptqspY`xx\u007f';
   bass = bass + bass + bass2 + bass2;
 
+  tmp2 = '" style="width:20px;height:20px;float:left;box-shadow:-2px -2px 8px rgba(0,0,0,0.4) inset, 0 0 2px #000 inset;"></div>';
   for (i = 0; i < s; i++) {
     grid.push(0);
-    if (i > 19) {
-      html += '<div id="tis-' + i + '" style="width:20px;height:20px;float:left;box-shadow:-2px -2px 8px rgba(0,0,0,0.4) inset, 0 0 2px #000 inset;"></div>';
+    if (i > 19 && i < 220) {
+      html += '<div id="tis-' + i + tmp2;
     }
   }
 
-  html += '</div><div id="tis-status" style="position:absolute;right:20px;top:40px;width:80px;color:#eee;font:normal 15px sans-serif"></div></div>';
+  html += '</div><div style="position:absolute;right:20px;top:40px;width:80px;color:#eee;font:normal 15px sans-serif"><div id="tis-status"></div>Next<br>';
+  for (i = 220; i < s; i++) {
+    if (i % w < 4) {
+      html += '<div id="tis-' + i + tmp2;
+    }
+  }
+  html += '</div></div>';
 
   // Music!
   tmp2 = 881856; // 4593 samples/eighth * 8 eighths/bar * 24 bars
@@ -123,17 +131,20 @@ document.addEventListener('DOMContentLoaded', function() {
   tmp.innerHTML = html;
   document.body.appendChild(tmp);
 
-  function isSolidAt(x, y, rotation) {
+  function isSolidAt(x, y, rotation, tetromino) {
     return currentTetromino &&
       (x&3) == x && (y&3) == y && // range check for [0, 4)
-      (shapes[currentTetromino][rotation] & (1 << (4 * y + x)));
+      (shapes[tetromino || currentTetromino][rotation] & (1 << (4 * y + x)));
   }
 
   function render() {
     for (tmp = currentY; currentTetromino && !isBlocked(currentX, tmp+1, currentRotation); tmp++);
-    for (y = 0; y < h; y++) {
+    for (y = 0; y < h+4; y++) {
       for (x = 0; x < w; x++) {
         i = y*w + x;
+        if (y >= h) {
+          grid[i] = isSolidAt(x, y-h, 0, bag[0]) ? bag[0] : 0;
+        }
         shadowGrid[i] =
           isSolidAt(x-currentX, y-currentY, currentRotation) ? currentTetromino :
           isSolidAt(x-currentX, y-tmp, currentRotation) ? currentTetromino + 7 :
@@ -162,7 +173,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function spawn() {
     // Shuffle bag if needed
-    // TODO show next piece
     if (bag.length < 2) {
       tmp = 1;
       for (i = 0; i < 7; i++) {
