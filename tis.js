@@ -77,8 +77,9 @@
       currentX,
       currentY,
       currentRotation,
-      state = 0, // 0=PLAYING, 1=LOST
-      fillRows,
+      state = 0, // 0=PLAYING, 1=CLEARING, 2=LOST
+      stateTime,
+      linesClearing,
       score = 0,
       lines = 0,
       level = 1,
@@ -174,7 +175,10 @@
             isSolidAt(x-currentX, y-currentY, currentRotation) ? currentTetromino + 8 :
             grid[i] || 0;
           if (tmp3 = doc[getElementById]('tis-' + i)) {
-            tmp3.style.background = '#' + backgroundLUT[shadowGrid[i] % 8];
+            tmp3.style.background = '#' + (
+                state == 1 && stateTime % 4 < 2 && linesClearing[y] ?
+                'fff' :
+                backgroundLUT[shadowGrid[i] % 8]);
             tmp3.style.opacity = shadowGrid[i] > 7 ? 0.2 : 1;
           }
         }
@@ -206,14 +210,25 @@
       if (delta > .1) delta = .1;
       lastFrame = now;
       switch (state) {
-        case 1:
-          if (fillRows > 1) {
+        case 2:
+          if (stateTime-- > 4 && !(stateTime % 4)) {
             for (x = 0; x < w; x++) {
-              grid[fillRows*w + x] = 1 + Math.floor(Math.random() * 7);
+              grid[stateTime*w/4 + x] = 1 + Math.floor(Math.random() * 7);
             }
             render();
-            fillRows--;
           }
+          break;
+
+        case 1:
+          if (--stateTime < 0) {
+            for (y in linesClearing) {
+              for (i = y*w+w-1; i >= 0; i--) {
+                grid[i] = grid[i-w];
+              }
+            }
+            state = 0;
+          }
+          render();
           break;
 
         case 0:
@@ -276,6 +291,7 @@
 
             // Find full rows
             tmp2 = 0;
+            linesClearing = [];
             for (y = 0; y < h; y++) {
               tmp = 1;
               for (x = 0; x < w; x++) {
@@ -285,12 +301,10 @@
                 }
               }
               if (tmp) {
-                // Clear line
-                // TODO animation
+                linesClearing[y] = 1;
                 tmp2++;
-                for (i = y*w+w-1; i >= 0; i--) {
-                  grid[i] = grid[i-w];
-                }
+                state = 1;
+                stateTime = 6;
               }
             }
             score += [0, 100, 300, 500, 800][tmp2] * level;
@@ -315,8 +329,8 @@
             gravityTimer = 0;
             if (!tryMove(3, 0, 0)) {
               // Game over
-              state = 1;
-              fillRows = h;
+              state = 2;
+              stateTime = 4*h;
             }
             render();
           }
