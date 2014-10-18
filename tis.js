@@ -143,7 +143,10 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }
-  html += '<audio id="tis-music" src="' + URL.createObjectURL(new Blob([tmp], {type: 'audio/wav'})) + '" loop' + (location.hash == '#m' ? '' : ' autoplay') + '></audio>';
+  music = doc.createElement('audio');
+  music.src = URL.createObjectURL(new Blob([tmp], {type: 'audio/wav'}));
+  music.loop = 1;
+  music.autoplay = location.hash == '#m';
 
   tmp = doc.createElement('div');
   tmp.innerHTML = html;
@@ -335,8 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
   doc[addEventListener]('keydown', function onKeyDown(e) {
     tmp = e.keyCode;
     if (tmp == 77) {
-      tmp = doc[getElementById]('tis-music');
-      if (tmp.paused) tmp.play(); else tmp.pause();  
+      if (music.paused) music.play(); else music.pause();  
     }
     if (!keysPressed[tmp]) {
       keysPressed[tmp] = 0;
