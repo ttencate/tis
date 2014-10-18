@@ -2,18 +2,17 @@
 <html>
   <head>
     <title>Tis test</title>
-    <style>
-      html, body, iframe {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        border: 0;
-      }
-    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   </head>
   <body>
-    <iframe src="tis.min.js"></iframe>
+    <p id="length" style="text-align: center; margin: 40px auto;"></p>
+    <pre id="code" style="margin: 40px auto; width: 64em; line-height: 1em; white-space: pre; word-wrap: break-word;"></pre>
+    <script>
+      $.get('tis.min.js', function(code) {
+        $('#length').text('Size: ' + code.length + ' bytes');
+        $('#code').text(code);
+      });
+    </script>
     <script src="tis.js"></script>
   </body>
 </html>
