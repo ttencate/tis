@@ -171,32 +171,6 @@ document.addEventListener('DOMContentLoaded', function() {
     return 0;
   }
 
-  function spawn() {
-    // Shuffle bag if needed
-    if (bag.length < 2) {
-      tmp = 1;
-      for (i = 0; i < 7; i++) {
-        j = 0;
-        while (tmp & (1 << j)) {
-          j = Math.ceil(Math.random() * 7);
-        }
-        tmp |= 1 << j;
-        bag.push(j);
-      }
-    }
-
-    // Spawn new tetromino
-    currentTetromino = bag.shift();
-    currentX = 3;
-    currentY = 0;
-    currentRotation = 0;
-    gravityTimer = 0;
-    lockTimer = 0;
-
-    render();
-  }
-  spawn();
-
   function frame(now) {
     delta = (now - lastFrame) / 1e3 || 0;
     lastFrame = now;
@@ -273,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         }
 
-        if (lockTimer > 1 && isBlocked(currentX, currentY + 1, currentRotation)) {
+        if (!currentTetromino || lockTimer > 1 && isBlocked(currentX, currentY + 1, currentRotation)) {
           // Lock it in place
           render();
           for (i = 0; i < s; i++) grid[i] = shadowGrid[i];
@@ -301,7 +275,26 @@ document.addEventListener('DOMContentLoaded', function() {
           lines += tmp2;
           level = 1 + Math.floor(lines / 10);
 
-          spawn();
+          // Shuffle bag if needed
+          if (bag.length < 2) {
+            tmp = 1;
+            for (i = 0; i < 7; i++) {
+              j = 0;
+              while (tmp & (1 << j)) {
+                j = Math.ceil(Math.random() * 7);
+              }
+              tmp |= 1 << j;
+              bag.push(j);
+            }
+          }
+
+          // Spawn new tetromino
+          currentTetromino = bag.shift();
+          currentX = 3;
+          currentY = 0;
+          currentRotation = 0;
+          gravityTimer = 0;
+          lockTimer = 0;
 
           if (isBlocked(currentX, currentY, currentRotation)) {
             // Game over
