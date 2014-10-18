@@ -38,20 +38,15 @@ document.addEventListener('DOMContentLoaded', function() {
       // x I J L O S T Z
       backgroundLUT = '080808 0dd 36f e80 dd0 0e0 c0c f22'.split(' '),
       // http://tetris.wikia.com/wiki/SRS
-      //     1     2     4     8
-      //    16    32    64   128
-      //   256   512  1024  2048
-      //  4096  8192 16384 32768
-      shapes = [
-        , // empty
-        [240, 17476, 3840, 8738], // I
-        [113, 550, 1136, 802], // J
-        [116, 1570, 368, 547], // L
-        [102, 102, 102, 102], // O
-        [54, 1122, 864, 561], // S
-        [114, 610, 624, 562], // T
-        [99, 612, 1584, 306] // Z
-      ],
+      //
+      // Base-64 encoded string of bytes, consisting of 8 bytes for each tetromino.
+      // Each 8-byte block is 4 words of 2 bytes, each word representing a rotation:
+      //
+      // 7 6 5 4 <- first byte
+      // 3 2 1 0 <- first byte
+      // 7 6 5 4 <- second byte
+      // 3 2 1 0 <- second byte
+      shapes = atob('8ABERAAPIiJxACYCcAQiA3QAIgZwASMCZgBmAGYAZgA2AGIEYAMxAnIAYgJwAjICYwBkAjAGMgE'),
       // Wall kick tables: http://tetrisconcept.net/wiki/SRS#Wall_Kicks
       //
       // Each table is represented as 4 * 5 characters.
@@ -156,8 +151,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function isSolidAt(x, y, rotation, tetromino) {
     return currentTetromino &&
-      (x&3) == x && (y&3) == y && // range check for [0, 4)
-      (shapes[tetromino || currentTetromino][rotation] & (1 << (4 * y + x)));
+      !(x & ~3) && !(y & ~3) && // range check for [0, 4)
+      (shapes.charCodeAt(8*(tetromino || currentTetromino) - 8 + 2*rotation + (y>>1)) & (1 << (4 * (y&1) + x)));
   }
 
   function render() {
