@@ -319,14 +319,17 @@
     frame(0);
 
     function onKeyDown(e) {
-      if (e.keyCode == 77) {
+      tmp = e.keyCode;
+      if (tmp == 77) {
         tmp = doc[getElementById]('tis-music');
         if (tmp.paused) tmp.play(); else tmp.pause();  
       }
-      if (!keysPressed[e.keyCode]) {
-        keysPressed[e.keyCode] = 0;
+      if (!keysPressed[tmp]) {
+        keysPressed[tmp] = 0;
       }
-      if (!(e.ctrlKey || e.shiftKey || e.altKey || e.metaKey)) {
+      // 37-40: arrow keys
+      // 81, 88, 90, 186: rotation keys
+      if (tmp > 36 && tmp < 41 || tmp == 88 || tmp == 88 || tmp == 90 || tmp == 186) {
         e.preventDefault();
       }
     }
