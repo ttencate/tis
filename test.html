@@ -8,8 +8,8 @@
     <p id="length" style="text-align: center; margin: 40px auto;"></p>
     <pre id="code" style="margin: 40px auto; width: 64em; line-height: 1em; white-space: pre; word-wrap: break-word;"></pre>
     <script>
-      $.get('tis.min.js', function(code) {
-        $('#length').text('Size: ' + code.length + ' bytes');
+      $.get('tis.min.js', function(code, textStatus, xhr) {
+        $('#length').text('Size: ' + xhr.getResponseHeader('Content-Length') + ' bytes');
         $('#code').text(code);
       });
     </script>

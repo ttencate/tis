@@ -129,7 +129,6 @@ document.addEventListener('DOMContentLoaded', function() {
   function isSolidAt(x, y, rotation) {
     return currentTetromino &&
       (x&3) == x && (y&3) == y && // range check for [0, 4)
-      //x >= 0 && x < 4 && y >= 0 && y < 4 &&
       (shapes[currentTetromino][rotation] & (1 << (4 * y + x)));
   }
 
