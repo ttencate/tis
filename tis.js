@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // TODO Konami code launcher
   var
       doc = document,
+      math = Math,
       getElementById = 'getElementById',
       addEventListener = 'addEventListener',
       music = [
@@ -150,10 +151,10 @@ document.addEventListener('DOMContentLoaded', function() {
     music[delta] += music[delta] + thirdVerse[delta];
     for (i = 44, j = 0; j < music[delta].length; j++) {
       tmp3 = music[delta].charCodeAt(j) - (delta == 2 ? 64 : 32);
-      x = 2 * Math.PI * (delta == 2 ? 55 : 261.63) * Math.pow(2, (tmp3 % 24) / 12) / 22050;
+      x = 2 * math.PI * (delta == 2 ? 55 : 261.63) * math.pow(2, (tmp3 % 24) / 12) / 22050;
       tmp2 = [.2, .1, .1][delta];
-      for (y = 0; y < 4593 * [1, 3, 2, 4][Math.floor(tmp3 / 24)]; y++) {
-        tmp[i++] += 127 * ((delta == 0) + tmp2 * (Math.sin(y * x) > 0 ? 1 : -1));
+      for (y = 0; y < 4593 * [1, 3, 2, 4][math.floor(tmp3 / 24)]; y++) {
+        tmp[i++] += 127 * ((delta == 0) + tmp2 * (math.sin(y * x) > 0 ? 1 : -1));
         tmp2 *= 0.9999;
       }
     }
@@ -220,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
       case 2:
         if (stateTime-- > 4 && !(stateTime % 4)) {
           for (x = 0; x < w; x++) {
-            grid[stateTime*w/4 + x] = 1 + Math.floor(Math.random() * 7);
+            grid[stateTime*w/4 + x] = 1 + math.floor(math.random() * 7);
           }
           render();
         }
@@ -282,10 +283,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Apply gravity
-        gravityTimer += Math.max(
+        gravityTimer += math.max(
             keysPressed[40] ? 0.2 : 0,
-            // TODO tune speed (use spreadsheet?)
-            delta * (level+1) / 1.5);
+            delta * math.pow(1.23, level));
         if (gravityTimer > 1) {
           gravityTimer = 0;
           tryMove(currentX, currentY + 1, currentRotation);
@@ -316,14 +316,14 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           score += [0, 100, 300, 500, 800][tmp2] * level;
           lines += tmp2;
-          level = 1 + Math.floor(lines / 10);
+          level = 1 + math.floor(lines / 10);
 
           // Shuffle bag if needed
           if (bag.length < 2) {
             // tmp is a bitmask that tracks which tetrominos we've already added.
             // bit 0 is just a sentinel, bits 1-7 correspond to tetrominos.
             for (tmp = 1; tmp != 255;) {
-              for (j = 0; tmp & (1 << j); j = Math.ceil(Math.random() * 7));
+              for (j = 0; tmp & (1 << j); j = math.ceil(math.random() * 7));
               tmp |= 1 << j;
               bag.push(j);
             }
