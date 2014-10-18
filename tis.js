@@ -65,7 +65,7 @@
       lastFrame,
       i, j, x, y, tmp, tmp2, tmp3,
       // TODO instructions, credits
-      html = '<div id="tis-root" style="position:fixed;width:280px;height:400px;left:50%;top:50%;margin:-240px -160px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px;padding:40px"><div id="tis-grid" style="background:#000;width:200px;height:400px;box-shadow:0 0 10px #222;">'
+      html = '<div id="tis-root" style="position:fixed;width:280px;height:400px;left:50%;top:50%;margin:-240px -160px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px;padding:40px"><div id="tis-grid" style="background:#000;width:200px;height:400px;box-shadow:0 0 9px #222;">'
       ;
 
   doc[addEventListener]('DOMContentLoaded', function() {
@@ -81,13 +81,13 @@
       }
     }
 
-    html += '</div><div style="position:absolute;right:20px;top:40px;width:80px;color:#eee;font:normal 15px sans-serif"><div id="tis-status"></div>Next<br>';
+    html += '</div><div style="position:absolute;right:20px;top:40px;width:80px;color:#eee;font:normal 15px sans-serif"><div id="tis-status"></div>Next<div style="margin:8px 0;height:40px;box-shadow:0 0 9px #000;">';
     for (i = 220; i < s; i++) {
       if (i % w < 4) {
         html += '<div id="tis-' + i + tmp2;
       }
     }
-    html += '</div></div>';
+    html += '</div></div></div>';
 
     // Music!
     tmp2 = 881856; // 4593 samples/eighth * 8 eighths/bar * 24 bars
