@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   frame(0);
 
-  function onKeyDown(e) {
+  doc[addEventListener]('keydown', function onKeyDown(e) {
     tmp = e.keyCode;
     if (tmp == 77) {
       tmp = doc[getElementById]('tis-music');
@@ -344,10 +344,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (tmp > 36 && tmp < 41 || tmp == 88 || tmp == 88 || tmp == 90 || tmp == 186) {
       e.preventDefault();
     }
-  }
-  function onKeyUp(e) {
+  });
+  doc[addEventListener]('keyup', function onKeyUp(e) {
     delete keysPressed[e.keyCode];
-  }
-  doc[addEventListener]('keydown', onKeyDown);
-  doc[addEventListener]('keyup', onKeyUp);
+  });
 });
