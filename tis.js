@@ -330,7 +330,9 @@
       if (!keysPressed[e.keyCode]) {
         keysPressed[e.keyCode] = 0;
       }
-      // TODO preventDefault()
+      if (!(e.ctrlKey || e.shiftKey || e.altKey || e.metaKey)) {
+        e.preventDefault();
+      }
     }
     function onKeyUp(e) {
       delete keysPressed[e.keyCode];
