@@ -2,9 +2,14 @@ document.addEventListener('DOMContentLoaded', function() {
   // TODO Konami code launcher
   var
       doc = document,
-      math = Math,
-      getElementById = 'getElementById',
       addEventListener = 'addEventListener',
+      createElement = 'createElement',
+      getElementById = 'getElementById',
+
+      math = Math,
+
+      charCodeAt = 'charCodeAt',
+
       music = [
         // http://www.theoreticallycorrect.com/Helmholtz-Pitch-Numbering/
         //
@@ -33,14 +38,17 @@ document.addEventListener('DOMContentLoaded', function() {
         // Bass voice
         'LSOSLSOSKSNSKSNSLSOSLSOSKSNSKSNS'
       ],
+
       // First 2 invisible lines, then 20 visible lines, then 2 for the Next display.
       grid = [],
       shadowGrid = [],
       w = 10,
       h = 22,
       s = w*h+20,
+
       // x I J L O S T Z
-      backgroundLUT = '080808 0dd 36f e80 dd0 0e0 c0c f22'.split(' '),
+      colors = '080808 0dd 36f e80 dd0 0e0 c0c f22'.split(' '),
+
       // http://tetris.wikia.com/wiki/SRS
       //
       // Base-64 encoded string of bytes, consisting of 8 bytes for each tetromino.
@@ -51,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // 7 6 5 4 <- second byte
       // 3 2 1 0 <- second byte
       shapes = atob('8ABERAAPIiJxACYCcAQiA3QAIgZwASMCZgBmAGYAZgA2AGIEYAMxAnIAYgJwAjICYwBkAjAGMgE'),
+
       // Wall kick tables: http://tetrisconcept.net/wiki/SRS#Wall_Kicks
       //
       // Each table is represented as 4 * 5 characters.
@@ -71,24 +80,29 @@ document.addEventListener('DOMContentLoaded', function() {
       // +2   @  A  B  C  D
       wallKickTableI = '203(C214A,241<!230#8', // I
       wallKickTableRest = '219"!23+BC23;"#21)BA', // other blocks, including no-op O
-      leftRightRepeatDelta = .15,
+
+      bag = [],
       currentTetromino,
       currentX,
       currentY,
       currentRotation,
+
       state = 0, // 0=PLAYING, 1=CLEARING, 2=LOST
       stateTime,
       linesClearing,
+
       score = 0,
       lines = 0,
       level = 1,
+
+      delta,
       gravityTimer, // between 0 and 1
       lockTimer = 0,
-      bag = [],
       keysPressed = [],
-      delta,
       lastFrame,
+
       i, j, x, y, tmp, tmp2, tmp3, tmp4,
+
       html =
         '<div style="position:fixed;width:360px;left:50%;top:50%;margin:-270px -180px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px">' +
           '<div style="margin:20px 40px;font-size:80%;color:#888">' +
@@ -120,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   html += '</div>' +
         '</div>';
-  tmp = doc.createElement('div');
+  tmp = doc[createElement]('div');
   tmp.innerHTML = html;
   doc.body.appendChild(tmp);
 
@@ -150,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
   for (delta in music) {
     music[delta] += music[delta] + thirdVerse[delta];
     for (i = 44, j = 0; j < music[delta].length; j++) {
-      tmp3 = music[delta].charCodeAt(j) - (delta == 2 ? 64 : 32);
+      tmp3 = music[delta][charCodeAt](j) - (delta == 2 ? 64 : 32);
       x = 2 * math.PI * (delta == 2 ? 55 : 261.63) * math.pow(2, (tmp3 % 24) / 12) / 22050;
       tmp2 = [.2, .1, .1][delta];
       for (y = 0; y < 4593 * [1, 3, 2, 4][math.floor(tmp3 / 24)]; y++) {
@@ -159,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }
-  music = doc.createElement('audio');
+  music = doc[createElement]('audio');
   music.src = URL.createObjectURL(new Blob([tmp], {type: 'audio/wav'}));
   music.loop = 1;
   if (location.hash != '#m') music.play();
@@ -167,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function isSolidAt(x, y, rotation, tetromino) {
     return currentTetromino &&
       !(x & ~3) && !(y & ~3) && // range check for [0, 4)
-      (shapes.charCodeAt(8*(tetromino || currentTetromino) - 8 + 2*rotation + (y>>1)) & (1 << (4 * (y&1) + x)));
+      (shapes[charCodeAt](8*(tetromino || currentTetromino) - 8 + 2*rotation + (y>>1)) & (1 << (4 * (y&1) + x)));
   }
 
   function render() {
@@ -188,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
           tmp3.background = '#' + (
               state == 1 && stateTime % 4 < 2 && linesClearing[y] ?
               'fff' :
-              backgroundLUT[shadowGrid[i] % 8]);
+              colors[shadowGrid[i] % 8]);
           tmp3.opacity = shadowGrid[i] > 7 ? 0.2 : 1;
         }
       }
@@ -247,13 +261,13 @@ document.addEventListener('DOMContentLoaded', function() {
             case 37:
               // Left
               if (keysPressed[tmp2] < 0) break;
-              keysPressed[tmp2] -= leftRightRepeatDelta;
+              keysPressed[tmp2] -= .15;
               tryMove(currentX - 1, currentY, currentRotation);
               break;
             case 39:
               // Right
               if (keysPressed[tmp2] < 0) break;
-              keysPressed[tmp2] -= leftRightRepeatDelta;
+              keysPressed[tmp2] -= .15;
               tryMove(currentX + 1, currentY, currentRotation);
               break;
             case 38:
@@ -271,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
               // Rotate right
               if (!keysPressed[tmp2]) {
                 for (i = 0; i < 5; i++) {
-                  tmp = (currentTetromino == 1 ? wallKickTableI : wallKickTableRest).charCodeAt(((currentRotation + 4 + (tmp4-1)/2))%4 * 5 + i) - 32;
+                  tmp = (currentTetromino == 1 ? wallKickTableI : wallKickTableRest)[charCodeAt](((currentRotation + 4 + (tmp4-1)/2))%4 * 5 + i) - 32;
                   if (tryMove(currentX + tmp4 * ((tmp & 7) - 2), currentY + tmp4 * (2 - (tmp >> 3)), (currentRotation+4+tmp4) % 4)) {
                     break;
                   }
