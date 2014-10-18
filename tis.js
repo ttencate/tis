@@ -35,8 +35,8 @@
       w = 10,
       h = 22,
       s = w*h+20,
-      // I J L O S T Z
-      backgroundLUT = '#080808 #0dd #36f #e80 #dd0 #0e0 #c0c #f22 #002c2c #0a1433 #301b00 #2c2c00 #003000 #290029 #330707'.split(' '),
+      // x I J L O S T Z
+      backgroundLUT = '080808 0dd 36f e80 dd0 0e0 c0c f22 002c2c 0a1433 301b00 2c2c00 003000 290029 330707'.split(' '),
       // http://tetris.wikia.com/wiki/SRS
       //     1     2     4     8
       //    16    32    64   128
@@ -152,7 +152,7 @@
             isSolidAt(x-currentX, y-tmp, currentRotation) ? currentTetromino + 7 :
             grid[i] || 0;
           if (tmp3 = doc[getElementById]('tis-' + i)) {
-            tmp3.style.background = backgroundLUT[shadowGrid[i]];
+            tmp3.style.background = '#' + backgroundLUT[shadowGrid[i]];
           }
         }
       }
