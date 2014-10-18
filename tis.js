@@ -1,9 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // TODO create all HTML in one go so our elements don't get recreated
-  document.body.innerHTML += '<div id="tis-root" style="position:fixed;width:280px;height:400px;left:50%;top:50%;margin:-240px -160px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px;padding:40px"><div id="tis-grid" style="background:#000;width:200px;height:400px;box-shadow:0 0 10px #222;"></div><div id="tis-status" style="position:absolute;right:20px;top:40px;width:80px;color:#eee;font:normal 15px sans-serif"></div></div>';
   var gridElt = document.getElementById('tis-grid'),
-      gridElts = [],
-      statusElt,
       // http://www.theoreticallycorrect.com/Helmholtz-Pitch-Numbering/
       //
       // Lowest note in treble: 60
@@ -63,7 +59,8 @@ document.addEventListener('DOMContentLoaded', function() {
       keysPressed = [],
       delta,
       lastFrame,
-      i, j, x, y, tmp, tmp2, tmp3
+      i, j, x, y, tmp, tmp2, tmp3,
+      html = '<div id="tis-root" style="position:fixed;width:280px;height:400px;left:50%;top:50%;margin:-240px -160px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px;padding:40px"><div id="tis-grid" style="background:#000;width:200px;height:400px;box-shadow:0 0 10px #222;">'
       ;
   treble[0] = treble[0] + treble[0] + 'xtvstqpsxtvs\\`}|x';
   treble[1] = treble[1] + treble[1] + 'tqspqqpptqspY`xx\u007f';
@@ -72,9 +69,11 @@ document.addEventListener('DOMContentLoaded', function() {
   for (i = 0; i < s; i++) {
     grid.push(0);
     if (i > 19) {
-      gridElt.innerHTML += '<div id="tis-' + i + '" style="width:20px;height:20px;float:left;box-shadow:-2px -2px 8px rgba(0,0,0,0.4) inset, 0 0 2px #000 inset;"></div>';
+      html += '<div id="tis-' + i + '" style="width:20px;height:20px;float:left;box-shadow:-2px -2px 8px rgba(0,0,0,0.4) inset, 0 0 2px #000 inset;"></div>';
     }
   }
+
+  html += '</div><div id="tis-status" style="position:absolute;right:20px;top:40px;width:80px;color:#eee;font:normal 15px sans-serif"></div></div>';
 
   // Music!
   tmp2 = 881856; // 4593 samples/eighth * 8 eighths/bar * 24 bars
@@ -118,14 +117,11 @@ document.addEventListener('DOMContentLoaded', function() {
       tmp2 *= 0.9999;
     }
   }
-  document.body.innerHTML += '<audio id="tis-music" src="' + URL.createObjectURL(new Blob([tmp], {type: 'audio/wav'})) + '" loop' + (location.hash == '#m' ? '' : ' autoplay') + '></audio>';
- 
-  // Modifying document.innerHTML replaces the entire body, so pick up elements
-  // at a late stage.
-  statusElt = document.getElementById('tis-status');
-  for (i = 20; i < s; i++) {
-    gridElts[i] = document.getElementById('tis-' + i);
-  }
+  html += '<audio id="tis-music" src="' + URL.createObjectURL(new Blob([tmp], {type: 'audio/wav'})) + '" loop' + (location.hash == '#m' ? '' : ' autoplay') + '></audio>';
+
+  tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  document.body.appendChild(tmp);
 
   function isSolidAt(x, y, rotation) {
     return currentTetromino &&
@@ -142,13 +138,13 @@ document.addEventListener('DOMContentLoaded', function() {
           isSolidAt(x-currentX, y-currentY, currentRotation) ? currentTetromino :
           isSolidAt(x-currentX, y-tmp, currentRotation) ? currentTetromino + 7 :
           grid[i] || 0;
-        if (gridElts[i]) {
-          gridElts[i].style.background = backgroundLUT[shadowGrid[i]];
+        if (tmp3 = document.getElementById('tis-' + i)) {
+          tmp3.style.background = backgroundLUT[shadowGrid[i]];
         }
       }
     }
     tmp = '<div style="text-align:right;font-size:150%">';
-    statusElt.innerHTML = 'Score' + tmp + score + '</div>Lines' + tmp + lines + '</div>Level' + tmp + level + '</div>';
+    document.getElementById('tis-status').innerHTML = 'Score' + tmp + score + '</div>Lines' + tmp + lines + '</div>Level' + tmp + level + '</div>';
   }
 
   // XXX can probably shrink this by doing tryMove(dx, dy, dr) instead
@@ -264,6 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
             render();
           }
         }
+
         if (lockTimer > 1 && isBlocked(currentX, currentY + 1, currentRotation)) {
           // Lock it in place
           render();
