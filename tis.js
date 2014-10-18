@@ -22,12 +22,12 @@ document.addEventListener('DOMContentLoaded', function() {
       // Subtract 64 to get MIDI note number - 33.
       bass = 'GNKNGNKNLSOSLSOSKSNSKSNSLSNSL@BCESOSESOSCOCOCOCOBNBN?J?J@CGL@@@@',
       bass2 = 'LSOSLSOSKSNSKSNSLSOSLSOSKSNSKSNS',
-      // First 2 invisible lines, then 20 visible lines, then 4 for the Next display.
+      // First 2 invisible lines, then 20 visible lines, then 2 for the Next display.
       grid = [],
       shadowGrid = [],
       w = 10,
       h = 22,
-      s = w*h+40,
+      s = w*h+20,
       // I J L O S T Z
       backgroundLUT = '#080808 #0dd #36f #e80 #dd0 #0e0 #c0c #f22 #002c2c #0a1433 #301b00 #2c2c00 #003000 #290029 #330707'.split(' '),
       // http://tetris.wikia.com/wiki/SRS
@@ -186,9 +186,11 @@ document.addEventListener('DOMContentLoaded', function() {
         break;
 
       case 0:
+        // Handle keyboard input
         for (tmp2 in keysPressed) {
           switch (parseInt(tmp2)) {
-            case 37: // left
+            case 37:
+              // Left
               if (keysPressed[tmp2] < 0) break;
               keysPressed[tmp2] -= leftRightRepeatDelta;
               if (!isBlocked(currentX - 1, currentY, currentRotation)) {
@@ -197,7 +199,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 render();
               }
               break;
-            case 39: // right
+            case 39:
+              // Right
               if (keysPressed[tmp2] < 0) break;
               keysPressed[tmp2] -= leftRightRepeatDelta;
               if (!isBlocked(currentX + 1, currentY, currentRotation)) {
@@ -206,14 +209,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 render();
               }
               break;
-            case 38: // up
-              // Hard drop
+            case 38:
+              // Up: hard drop
               if (keysPressed[tmp2]) break;
               while (!isBlocked(currentX, currentY + 1, currentRotation)) currentY++;
               lockTimer = 9;
               break;
             case 90: // z
             case 186: // ; (dvorak)
+              // Rotate left
               // TODO wall kicks
               // http://web.archive.org/web/20081216145551/http://www.the-shell.net/img/srs_study.html
               if (!keysPressed[tmp2] && !isBlocked(currentX, currentY, (currentRotation+3) % 4)) {
@@ -224,6 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
               break;
             case 88: // x
             case 81: // q (dvorak)
+              // Rotate right
               if (!keysPressed[tmp2] && !isBlocked(currentX, currentY, (currentRotation+1) % 4)) {
                 currentRotation = (currentRotation+1)%4;
                 lockTimer = 0;
@@ -234,6 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
           keysPressed[tmp2] += delta;
         }
 
+        // Apply gravity
         gravityTimer += Math.max(
             keysPressed[40] ? 0.2 : 0,
             // TODO tune speed (use spreadsheet?)
