@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
       x = 2 * Math.PI * (delta == 2 ? 55 : 261.63) * Math.pow(2, (tmp3 % 24) / 12) / 22050;
       tmp2 = [.2, .1, .1][delta];
       for (y = 0; y < 4593 * [1, 3, 2, 4][Math.floor(tmp3 / 24)]; y++) {
-        tmp[i++] += 127 * ((!delta) + tmp2 * (Math.sin(y * x) > 0 ? 1 : -1));
+        tmp[i++] += 127 * ((delta == 0) + tmp2 * (Math.sin(y * x) > 0 ? 1 : -1));
         tmp2 *= 0.9999;
       }
     }
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
   music = doc.createElement('audio');
   music.src = URL.createObjectURL(new Blob([tmp], {type: 'audio/wav'}));
   music.loop = 1;
-  music.autoplay = location.hash == '#m';
+  if (location.hash != '#m') music.play();
 
   tmp = doc.createElement('div');
   tmp.innerHTML = html;
