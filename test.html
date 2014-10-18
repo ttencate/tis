@@ -9,7 +9,12 @@
     <pre id="code" style="margin: 40px auto; width: 64em; line-height: 1em; white-space: pre; word-wrap: break-word;"></pre>
     <script>
       $.get('tis.min.js', function(code, textStatus, xhr) {
-        $('#length').text('Size: ' + xhr.getResponseHeader('Content-Length') + ' bytes');
+        var size = xhr.getResponseHeader('Content-Length');
+        var target = 4096;
+        $('#length').text(
+            'Size: ' + size + ' bytes (' +
+            Math.abs(size - target) + ' bytes ' +
+            (size > target ? 'over' : 'under') + ' target)');
         $('#code').text(code);
       });
     </script>
