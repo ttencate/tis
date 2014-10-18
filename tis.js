@@ -50,7 +50,28 @@
         [102, 102, 102, 102], // O
         [54, 1122, 864, 561], // S
         [114, 610, 624, 562], // T
-        [99, 612, 1584, 306]], // Z
+        [99, 612, 1584, 306] // Z
+      ],
+      // Wall kick tables: http://tetrisconcept.net/wiki/SRS#Wall_Kicks
+      //
+      // Each table is represented as 4 * 5 characters.
+      // The first 4 are for orientation 0, etc., and the 5 characters are the
+      // possible offsets for a clockwise rotation from that orientation. (For
+      // counterclockwise, just negate the values.)
+      //
+      // Subtract 32, then:
+      // - bits 0-2 give x offset plus 2 (range: 0..4)
+      // - bits 3-5 give INVERTED y offset plus 2 (range: 0..4)
+      //   (inverted because the reference page above does that)
+      //
+      // y\x -2 -1  0 +1 +2
+      // -2  sp  !  "  #  $
+      // -1   (  )  *  +  ,
+      //  0   0  1  2  3  4
+      // +1   8  9  :  ;  <
+      // +2   @  A  B  C  D
+      wallKickTableI = '203(C214A,241<!230#8', // I
+      wallKickTableRest = '219"!23+BC23;"#21)BA', // other blocks, including no-op O
       leftRightRepeatDelta = .15,
       currentTetromino,
       currentX,
@@ -67,7 +88,7 @@
       keysPressed = [],
       delta,
       lastFrame,
-      i, j, x, y, tmp, tmp2, tmp3,
+      i, j, x, y, tmp, tmp2, tmp3, tmp4,
       // TODO instructions, credits
       html = '<div id="tis-root" style="position:fixed;width:280px;height:400px;left:50%;top:50%;margin:-240px -160px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px;padding:40px"><div id="tis-grid" style="background:#000;width:200px;height:400px;box-shadow:0 0 9px #222;">'
       ;
@@ -197,6 +218,7 @@
 
         case 0:
           // Handle keyboard input
+          tmp4 = 1;
           for (tmp2 in keysPressed) {
             switch (parseInt(tmp2)) {
               case 37:
@@ -220,17 +242,17 @@
               case 90: // z
               case 186: // ; (dvorak)
                 // Rotate left
-                // TODO wall kicks
-                // http://web.archive.org/web/20081216145551/http://www.the-shell.net/img/srs_study.html
-                if (!keysPressed[tmp2]) {
-                  tryMove(currentX, currentY, (currentRotation+3) % 4);
-                }
-                break;
+                tmp4 = -1; // 1 for right, -1 for left
               case 88: // x
               case 81: // q (dvorak)
                 // Rotate right
                 if (!keysPressed[tmp2]) {
-                  tryMove(currentX, currentY, (currentRotation+1) % 4);
+                  for (i = 0; i < 5; i++) {
+                    tmp = (currentTetromino == 1 ? wallKickTableI : wallKickTableRest).charCodeAt(((currentRotation + 4 + (tmp4-1)/2))%4 * 5 + i) - 32;
+                    if (tryMove(currentX + tmp4 * ((tmp & 7) - 2), currentY + tmp4 * (2 - (tmp >> 3)), (currentRotation+4+tmp4) % 4)) {
+                      break;
+                    }
+                  }
                 }
                 break;
             }
