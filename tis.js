@@ -140,7 +140,8 @@
     }
 
     function render() {
-      for (tmp = currentY; currentTetromino && !isBlocked(currentX, tmp+1, currentRotation); tmp++);
+      tmp = currentY;
+      while (currentTetromino && tryMove(currentX, currentY+1, currentRotation, 1));
       for (y = 0; y < h+4; y++) {
         for (x = 0; x < w; x++) {
           i = y*w + x;
@@ -148,8 +149,8 @@
             grid[i] = isSolidAt(x, y-h, 0, bag[0]) ? bag[0] : 0;
           }
           shadowGrid[i] =
-            isSolidAt(x-currentX, y-currentY, currentRotation) ? currentTetromino :
-            isSolidAt(x-currentX, y-tmp, currentRotation) ? currentTetromino + 8 :
+            isSolidAt(x-currentX, y-tmp, currentRotation) ? currentTetromino :
+            isSolidAt(x-currentX, y-currentY, currentRotation) ? currentTetromino + 8 :
             grid[i] || 0;
           if (tmp3 = doc[getElementById]('tis-' + i)) {
             tmp3.style.background = '#' + backgroundLUT[shadowGrid[i] % 8];
@@ -157,25 +158,31 @@
           }
         }
       }
+      currentY = tmp;
       tmp = '<div style="text-align:right;font-size:150%">';
       doc[getElementById]('tis-status').innerHTML = 'Score' + tmp + score + '</div>Lines' + tmp + lines + '</div>Level' + tmp + level + '</div>';
     }
 
-    // XXX can probably shrink this by doing tryMove(dx, dy, dr) instead
-    function isBlocked(posX, posY, rotation) {
+    function tryMove(posX, posY, rotation, doNotRender) {
       for (y = posY; y < posY+4; y++) {
         for (x = posX; x < posX+4; x++) {
           if (isSolidAt(x-posX, y-posY, rotation) &&
               (x < 0 || x >= w || y < 0 || y >= h || grid[y*w + x])) {
-            return 1;
+            return 0;
           }
         }
       }
-      return 0;
+      currentX = posX;
+      currentY = posY;
+      currentRotation = rotation;
+      lockTimer = 0;
+      doNotRender || render();
+      return 1;
     }
 
     function frame(now) {
       delta = (now - lastFrame) / 1e3 || 0;
+      if (delta > .1) delta = .1;
       lastFrame = now;
       switch (state) {
         case 1:
@@ -196,26 +203,18 @@
                 // Left
                 if (keysPressed[tmp2] < 0) break;
                 keysPressed[tmp2] -= leftRightRepeatDelta;
-                if (!isBlocked(currentX - 1, currentY, currentRotation)) {
-                  currentX--;
-                  lockTimer = 0;
-                  render();
-                }
+                tryMove(currentX - 1, currentY, currentRotation);
                 break;
               case 39:
                 // Right
                 if (keysPressed[tmp2] < 0) break;
                 keysPressed[tmp2] -= leftRightRepeatDelta;
-                if (!isBlocked(currentX + 1, currentY, currentRotation)) {
-                  currentX++;
-                  lockTimer = 0;
-                  render();
-                }
+                tryMove(currentX + 1, currentY, currentRotation);
                 break;
               case 38:
                 // Up: hard drop
                 if (keysPressed[tmp2]) break;
-                while (!isBlocked(currentX, currentY + 1, currentRotation)) currentY++;
+                while (tryMove(currentX, currentY + 1, currentRotation));
                 lockTimer = 9;
                 break;
               case 90: // z
@@ -223,19 +222,15 @@
                 // Rotate left
                 // TODO wall kicks
                 // http://web.archive.org/web/20081216145551/http://www.the-shell.net/img/srs_study.html
-                if (!keysPressed[tmp2] && !isBlocked(currentX, currentY, (currentRotation+3) % 4)) {
-                  currentRotation = (currentRotation+3)%4;
-                  lockTimer = 0;
-                  render();
+                if (!keysPressed[tmp2]) {
+                  tryMove(currentX, currentY, (currentRotation+3) % 4);
                 }
                 break;
               case 88: // x
               case 81: // q (dvorak)
                 // Rotate right
-                if (!keysPressed[tmp2] && !isBlocked(currentX, currentY, (currentRotation+1) % 4)) {
-                  currentRotation = (currentRotation+1)%4;
-                  lockTimer = 0;
-                  render();
+                if (!keysPressed[tmp2]) {
+                  tryMove(currentX, currentY, (currentRotation+1) % 4);
                 }
                 break;
             }
@@ -249,14 +244,10 @@
               delta * (level+1) / 1.5);
           if (gravityTimer > 1) {
             gravityTimer = 0;
-            if (!isBlocked(currentX, currentY + 1, currentRotation)) {
-              currentY++;
-              lockTimer = 0;
-              render();
-            }
+            tryMove(currentX, currentY + 1, currentRotation);
           }
 
-          if (!currentTetromino || lockTimer > 1 && isBlocked(currentX, currentY + 1, currentRotation)) {
+          if (!currentTetromino || lockTimer > 1) {
             // Lock it in place
             render();
             for (i = 0; i < s; i++) grid[i] = shadowGrid[i];
@@ -299,13 +290,8 @@
 
             // Spawn new tetromino
             currentTetromino = bag.shift();
-            currentX = 3;
-            currentY = 0;
-            currentRotation = 0;
             gravityTimer = 0;
-            lockTimer = 0;
-
-            if (isBlocked(currentX, currentY, currentRotation)) {
+            if (!tryMove(3, 0, 0)) {
               // Game over
               state = 1;
               fillRows = h;
