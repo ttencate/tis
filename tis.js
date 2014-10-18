@@ -25,8 +25,10 @@ document.addEventListener('DOMContentLoaded', function() {
         'GNKNGNKNLSOSLSOSKSNSKSNSLSNSL@BCESOSESOSCOCOCOCOBNBN?J?J@CGL@@@@'
       ],
       thirdVerse = [
+        // Treble voices
         'xtvstqpsxtvs\\`}|x',
         'tqspqqpptqspY`xx\u007f',
+        // Bass voice
         'LSOSLSOSKSNSKSNSLSOSLSOSKSNSKSNS'
       ],
       // First 2 invisible lines, then 20 visible lines, then 2 for the Next display.
@@ -89,11 +91,6 @@ document.addEventListener('DOMContentLoaded', function() {
       html = '<div id="tis-root" style="position:fixed;width:280px;height:400px;left:50%;top:50%;margin:-240px -160px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px;padding:40px"><div id="tis-grid" style="background:#000;width:200px;height:400px;box-shadow:0 0 9px #222;">'
       ;
 
-  thirdVerse[2] += thirdVerse[2];
-  for (i in music) {
-    music[i] += music[i] + thirdVerse[i];
-  }
-
   tmp2 = '" style="width:20px;height:20px;float:left;box-shadow:-2px -2px 8px rgba(0,0,0,0.4) inset, 0 0 2px #000 inset;"></div>';
   for (i = 0; i < s; i++) {
     grid.push(0);
@@ -131,8 +128,10 @@ document.addEventListener('DOMContentLoaded', function() {
     0x64, 0x61, 0x74, 0x61, // "data"
     tmp2 & 0xFF, (tmp2 >> 8) & 0xff, tmp2 >> 16, 0 // data size
   ]);
+  thirdVerse[2] += thirdVerse[2];
   // delta is voice index
-  for (delta = 0; delta < 3; delta++) {
+  for (delta in music) {
+    music[delta] += music[delta] + thirdVerse[delta];
     for (i = 44, j = 0; j < music[delta].length; j++) {
       tmp3 = music[delta].charCodeAt(j) - (delta == 2 ? 64 : 32);
       x = 2 * Math.PI * (delta == 2 ? 55 : 261.63) * Math.pow(2, (tmp3 % 24) / 12) / 22050;
@@ -183,12 +182,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function tryMove(posX, posY, rotation, doNotRender) {
-    for (y = posY; y < posY+4; y++) {
-      for (x = posX; x < posX+4; x++) {
-        if (isSolidAt(x-posX, y-posY, rotation) &&
-            (x < 0 || x >= w || y < 0 || y >= h || grid[y*w + x])) {
-          return 0;
-        }
+    for (j = 0; x = (j&3), y = (j>>2), j < 16; j++) {
+      if (isSolidAt(x, y, rotation) &&
+          ((x += posX) < 0 || x >= w || (y += posY) < 0 || y >= h || grid[y*w + x])) {
+        return 0;
       }
     }
     currentX = posX;
@@ -281,7 +278,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!currentTetromino || lockTimer > 1) {
           // Lock it in place
           render();
-          for (i = 0; i < s; i++) grid[i] = shadowGrid[i];
+          for (i in grid) grid[i] = shadowGrid[i];
 
           // Find full rows
           tmp2 = 0;
