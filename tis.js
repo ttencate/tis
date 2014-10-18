@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
         [54, 1122, 864, 561], // S
         [114, 610, 624, 562], // T
         [99, 612, 1584, 306]], // Z
-      leftRightRepeatDelta = 150,
+      leftRightRepeatDelta = .15,
       currentTetromino,
       currentX,
       currentY,
@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
       lines = 0,
       level = 1,
       gravityTimer, // between 0 and 1
+      lockTimer = 0,
       bag = [],
       keysPressed = [],
       delta,
@@ -182,13 +183,14 @@ document.addEventListener('DOMContentLoaded', function() {
     currentY = 0;
     currentRotation = 0;
     gravityTimer = 0;
+    lockTimer = 0;
 
     render();
   }
   spawn();
 
   function frame(now) {
-    delta = (now - lastFrame) || 0;
+    delta = (now - lastFrame) / 1e3 || 0;
     lastFrame = now;
     switch (state) {
       case 1:
@@ -207,81 +209,99 @@ document.addEventListener('DOMContentLoaded', function() {
             case 37: // left
               if (keysPressed[tmp2] < 0) break;
               keysPressed[tmp2] -= leftRightRepeatDelta;
-              if (!isBlocked(currentX - 1, currentY, currentRotation)) currentX--;
+              if (!isBlocked(currentX - 1, currentY, currentRotation)) {
+                currentX--;
+                lockTimer = 0;
+                render();
+              }
               break;
             case 39: // right
               if (keysPressed[tmp2] < 0) break;
               keysPressed[tmp2] -= leftRightRepeatDelta;
-              if (!isBlocked(currentX + 1, currentY, currentRotation)) currentX++;
+              if (!isBlocked(currentX + 1, currentY, currentRotation)) {
+                currentX++;
+                lockTimer = 0;
+                render();
+              }
               break;
             case 38: // up
               // Hard drop
               if (keysPressed[tmp2]) break;
               while (!isBlocked(currentX, currentY + 1, currentRotation)) currentY++;
-              gravityTimer = 1;
+              lockTimer = 9;
               break;
             case 90: // z
             case 186: // ; (dvorak)
               // TODO wall kicks
               // http://web.archive.org/web/20081216145551/http://www.the-shell.net/img/srs_study.html
-              if (!keysPressed[tmp2] && !isBlocked(currentX, currentY, (currentRotation+3) % 4)) currentRotation = (currentRotation+3)%4;
+              if (!keysPressed[tmp2] && !isBlocked(currentX, currentY, (currentRotation+3) % 4)) {
+                currentRotation = (currentRotation+3)%4;
+                lockTimer = 0;
+                render();
+              }
               break;
             case 88: // x
             case 81: // q (dvorak)
-              if (!keysPressed[tmp2] && !isBlocked(currentX, currentY, (currentRotation+1) % 4)) currentRotation = (currentRotation+1)%4;
+              if (!keysPressed[tmp2] && !isBlocked(currentX, currentY, (currentRotation+1) % 4)) {
+                currentRotation = (currentRotation+1)%4;
+                lockTimer = 0;
+                render();
+              }
               break;
           }
           keysPressed[tmp2] += delta;
-          render();
         }
 
         gravityTimer += Math.max(
             keysPressed[40] ? 0.2 : 0,
             // TODO tune speed (use spreadsheet?)
-            delta * (level+1) / 1500);
+            delta * (level+1) / 1.5);
         if (gravityTimer > 1) {
           gravityTimer = 0;
           if (!isBlocked(currentX, currentY + 1, currentRotation)) {
             currentY++;
-          } else {
-            // Lock it in place
-            // TODO lock delay
+            lockTimer = 0;
             render();
-            for (i = 0; i < s; i++) grid[i] = shadowGrid[i];
+          }
+        }
+        if (lockTimer > 1) {
+          // Lock it in place
+          render();
+          for (i = 0; i < s; i++) grid[i] = shadowGrid[i];
 
-            // Find full rows
-            tmp2 = 0;
-            for (y = 0; y < h; y++) {
-              tmp = 1;
-              for (x = 0; x < w; x++) {
-                if (!grid[y*w + x]) {
-                  tmp = 0;
-                  break;
-                }
-              }
-              if (tmp) {
-                // Clear line
-                // TODO animation
-                tmp2++;
-                for (i = y*w+w-1; i >= 0; i--) {
-                  grid[i] = grid[i-w];
-                }
+          // Find full rows
+          tmp2 = 0;
+          for (y = 0; y < h; y++) {
+            tmp = 1;
+            for (x = 0; x < w; x++) {
+              if (!grid[y*w + x]) {
+                tmp = 0;
+                break;
               }
             }
-            score += [0, 100, 300, 500, 800][tmp2] * level;
-            lines += tmp2;
-            level = 1 + Math.floor(lines / 10);
-
-            spawn();
-
-            if (isBlocked(currentX, currentY, currentRotation)) {
-              // Game over
-              state = 1;
-              fillRows = h;
+            if (tmp) {
+              // Clear line
+              // TODO animation
+              tmp2++;
+              for (i = y*w+w-1; i >= 0; i--) {
+                grid[i] = grid[i-w];
+              }
             }
+          }
+          score += [0, 100, 300, 500, 800][tmp2] * level;
+          lines += tmp2;
+          level = 1 + Math.floor(lines / 10);
+
+          spawn();
+
+          if (isBlocked(currentX, currentY, currentRotation)) {
+            // Game over
+            state = 1;
+            fillRows = h;
           }
           render();
         }
+        lockTimer += delta;
     }
 
     window.requestAnimationFrame(frame);
