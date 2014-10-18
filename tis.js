@@ -168,11 +168,12 @@ document.addEventListener('DOMContentLoaded', function() {
           isSolidAt(x-currentX, y-currentY, currentRotation) ? currentTetromino + 8 :
           grid[i] || 0;
         if (tmp3 = doc[getElementById]('tis-' + i)) {
-          tmp3.style.background = '#' + (
+          tmp3 = tmp3.style;
+          tmp3.background = '#' + (
               state == 1 && stateTime % 4 < 2 && linesClearing[y] ?
               'fff' :
               backgroundLUT[shadowGrid[i] % 8]);
-          tmp3.style.opacity = shadowGrid[i] > 7 ? 0.2 : 1;
+          tmp3.opacity = shadowGrid[i] > 7 ? 0.2 : 1;
         }
       }
     }
