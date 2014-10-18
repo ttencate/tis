@@ -3,28 +3,32 @@
       doc = document,
       getElementById = 'getElementById',
       addEventListener = 'addEventListener',
-      // http://www.theoreticallycorrect.com/Helmholtz-Pitch-Numbering/
-      //
-      // Lowest note in treble: 60
-      // Highest note in treble: 83
-      //
-      // Subtract 32, then:
-      // - % 24 gives MIDI note number minus 60
-      // - / 24 gives duration: eighth, dotted quarter, quarter, half
-      // 
-      // Other way:
-      // note number - 28 + 24 * [0:eighth, 1:dotted quarter, 2:quarter, 3:half]
-      //
-      // http://i.ytimg.com/vi/bpBePVCUM7E/maxresdefault.jpg
-      // https://www.youtube.com/watch?v=IBkH5_gLF8Q
-      treble = [
+      music = [
+        // http://www.theoreticallycorrect.com/Helmholtz-Pitch-Numbering/
+        //
+        // Lowest note in treble: 60
+        // Highest note in treble: 83
+        //
+        // Subtract 32, then:
+        // - % 24 gives MIDI note number minus 60
+        // - / 24 gives duration: eighth, dotted quarter, quarter, half
+        // 
+        // Other way:
+        // note number - 28 + 24 * [0:eighth, 1:dotted quarter, 2:quarter, 3:half]
+        //
+        // http://i.ytimg.com/vi/bpBePVCUM7E/maxresdefault.jpg
+        // https://www.youtube.com/watch?v=IBkH5_gLF8Q
         '`+,^,+Y),`.,C,^`\\Yq^.1e31H,01.,C,^`\\Yq',
-        'T$$T,+)$),Y))<$TTYTl.).1^..D,\\.,<$TTTTT`'
+        'T$$T,+)$),Y))<$TTYTl.).1^..D,\\.,<$TTTTT`',
+        // All notes are eighths.
+        // Subtract 64 to get MIDI note number - 33.
+        'GNKNGNKNLSOSLSOSKSNSKSNSLSNSL@BCESOSESOSCOCOCOCOBNBN?J?J@CGL@@@@'
       ],
-      // All notes are eighths.
-      // Subtract 64 to get MIDI note number - 33.
-      bass = 'GNKNGNKNLSOSLSOSKSNSKSNSLSNSL@BCESOSESOSCOCOCOCOBNBN?J?J@CGL@@@@',
-      bass2 = 'LSOSLSOSKSNSKSNSLSOSLSOSKSNSKSNS',
+      thirdVerse = [
+        'xtvstqpsxtvs\\`}|x',
+        'tqspqqpptqspY`xx\u007f',
+        'LSOSLSOSKSNSKSNSLSOSLSOSKSNSKSNS'
+      ],
       // First 2 invisible lines, then 20 visible lines, then 2 for the Next display.
       grid = [],
       shadowGrid = [],
@@ -69,9 +73,10 @@
       ;
 
   doc[addEventListener]('DOMContentLoaded', function() {
-    treble[0] = treble[0] + treble[0] + 'xtvstqpsxtvs\\`}|x';
-    treble[1] = treble[1] + treble[1] + 'tqspqqpptqspY`xx\u007f';
-    bass = bass + bass + bass2 + bass2;
+    thirdVerse[2] += thirdVerse[2];
+    for (i in music) {
+      music[i] += music[i] + thirdVerse[i];
+    }
 
     tmp2 = '" style="width:20px;height:20px;float:left;box-shadow:-2px -2px 8px rgba(0,0,0,0.4) inset, 0 0 2px #000 inset;"></div>';
     for (i = 0; i < s; i++) {
@@ -110,25 +115,16 @@
       0x64, 0x61, 0x74, 0x61, // "data"
       tmp2 & 0xFF, (tmp2 >> 8) & 0xff, tmp2 >> 16, 0 // data size
     ]);
-    // delta is treble voice index
-    for (delta = 0; delta < 2; delta++) {
-      for (i = 44, j = 0; j < treble[delta].length; j++) {
-        tmp3 = treble[delta].charCodeAt(j) - 32;
-        x = 2 * Math.PI * 261.63 * Math.pow(2, (tmp3 % 24) / 12) / 22050;
-        tmp2 = 0.2 - 0.1 * delta;
+    // delta is voice index
+    for (delta = 0; delta < 3; delta++) {
+      for (i = 44, j = 0; j < music[delta].length; j++) {
+        tmp3 = music[delta].charCodeAt(j) - (delta == 2 ? 64 : 32);
+        x = 2 * Math.PI * (delta == 2 ? 55 : 261.63) * Math.pow(2, (tmp3 % 24) / 12) / 22050;
+        tmp2 = [.2, .1, .1][delta];
         for (y = 0; y < 4593 * [1, 3, 2, 4][Math.floor(tmp3 / 24)]; y++) {
-          tmp[i++] += 127 * ((1-delta) + tmp2 * (Math.sin(y * x) > 0 ? 1 : -1));
+          tmp[i++] += 127 * ((!delta) + tmp2 * (Math.sin(y * x) > 0 ? 1 : -1));
           tmp2 *= 0.9999;
         }
-      }
-    }
-    for (i = 44, j = 0; j < bass.length; j++) {
-      tmp3 = bass.charCodeAt(j) - 64;
-      x = 2 * Math.PI * 55 * Math.pow(2, tmp3 / 12) / 22050;
-      tmp2 = 0.1;
-      for (y = 0; y < 4593; y++) {
-        tmp[i++] += 127 * tmp2 * (Math.sin(y * x) > 0 ? 1 : -1);
-        tmp2 *= 0.9999;
       }
     }
     html += '<audio id="tis-music" src="' + URL.createObjectURL(new Blob([tmp], {type: 'audio/wav'})) + '" loop' + (location.hash == '#m' ? '' : ' autoplay') + '></audio>';
