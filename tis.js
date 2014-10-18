@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
             render();
           }
         }
-        if (lockTimer > 1) {
+        if (lockTimer > 1 && isBlocked(currentX, currentY + 1, currentRotation)) {
           // Lock it in place
           render();
           for (i = 0; i < s; i++) grid[i] = shadowGrid[i];
