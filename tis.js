@@ -125,9 +125,9 @@
             html =
               divStyleMargin + '-270px -180px;position:fixed;width:360px;left:50%;top:50%;font:13px sans-serif;background:rgba(0,0,0,.8)' + boxShadow + '0 0 30px #000;border-radius:30px">' +
                 divStyleMargin + '20px 40px;color:#888">' +
-                  '<b><a href="http://github.com/ttencate/tis" style="color:inherit">Tis</a></b>: Tetris in just 4 kB of JavaScript<br><br>' +
-                  'Left/right: move | Shift/Ctrl: rotate<br>' +
-                  'Down/up: soft/hard drop | M: music | Esc: quit' +
+                  '<b><a href="http://github.com/ttencate/tis" style="color:inherit">Tis</a></b>: Tetris in a mere 4 kB of JavaScript<br><br>' +
+                  'Left/right: move || Shift/Ctrl: rotate<br>' +
+                  'Down/up: soft/hard drop || M: music || Esc: quit' +
                 divEnd +
                 divStyleMargin + '0 20px;float:right;width:80px;color:#eee;font-size:15px">' +
                   '<div id="tis-status">' + divEnd +
