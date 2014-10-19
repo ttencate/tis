@@ -125,7 +125,7 @@
             html =
               divStyleMargin + '-270px -180px;position:fixed;width:360px;left:50%;top:50%;font:13px sans-serif;background:rgba(0,0,0,.8)' + boxShadow + '0 0 30px #000;border-radius:30px">' +
                 divStyleMargin + '20px 40px;color:#888">' +
-                  '<b><a href="http://github.com/ttencate/tis" style="color:inherit">Tis</a></b>: 4 kB of JavaScript<br><br>' +
+                  '<b><a href="http://github.com/ttencate/tis" style="color:inherit">Tis</a></b>: Tetris in just 4 kB of JavaScript<br><br>' +
                   'Left/right: move | Shift/Ctrl: rotate<br>' +
                   'Down/up: soft/hard drop | M: music | Esc: quit' +
                 divEnd +
@@ -205,6 +205,8 @@
           // ]);
           tmp5 = new Audio(URL.createObjectURL(new Blob([
             'RIFF',
+            // Assuming that this will be stored in little-endian.
+            // It's actually platform-specific...
             new Uint32Array([tmp5 + 36, 0x45564157, 0x20746d66, 16, 65537, 22050, 22050, 524289, 0x61746164, tmp5]),
             wavArray
           ], {type: 'audio/wav'})));
@@ -304,11 +306,9 @@
               }
               if (tmp2 == 37 || tmp2 == 39) {
                 // Move
-                // -1 for left, 1 for right
-                tmp4 = 1 - 2 * (tmp2 == 37);
                 if (keysPressed[tmp2] >= 0) {
                   keysPressed[tmp2] -= keysPressed[tmp2] ? .05 : .2;
-                  tryMove(currentX + tmp4, currentY, currentRotation);
+                  tryMove(currentX + 1 - 2 * (tmp2 == 37), currentY, currentRotation);
                 }
               }
               if (tmp2 == 38) {
