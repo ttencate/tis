@@ -7,13 +7,13 @@
       doc = document,
       addEventListener = 'addEventListener',
       charCodeAt = 'charCodeAt',
-
       keyCode = 'keyCode',
+      keydown = 'keydown',
 
       konamiCode = "&&((%'%'BA",
       nextCodeChar = 0;
 
-  doc[addEventListener]('keydown', function(e) {
+  doc[addEventListener](keydown, function(e) {
     nextCodeChar = e[keyCode] == konamiCode[charCodeAt](nextCodeChar) ? nextCodeChar + 1 : 0;
     if (nextCodeChar > 9) {
       (function() {
@@ -21,6 +21,7 @@
             createElement = 'createElement',
             getElementById = 'getElementById',
             removeEventListener = 'removeEventListener',
+            keyup = 'keyup',
 
             math = Math,
 
@@ -271,8 +272,8 @@
             for (tmp2 in keysPressed) {
               if (tmp2 == 27) { // Quit
                 doc.body.removeChild(html);
-                doc[removeEventListener]('keydown', onKeyDown);
-                doc[removeEventListener]('keyup', onKeyUp);
+                doc[removeEventListener](keydown, onKeyDown);
+                doc[removeEventListener](keyup, onKeyUp);
                 music.pause();
                 return;
               }
@@ -397,8 +398,8 @@
           delete keysPressed[e[keyCode]];
         }
 
-        doc[addEventListener]('keydown', onKeyDown);
-        doc[addEventListener]('keyup', onKeyUp);
+        doc[addEventListener](keydown, onKeyDown);
+        doc[addEventListener](keyup, onKeyUp);
       })();
     }
   });
