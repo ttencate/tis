@@ -238,7 +238,7 @@
           for (j = 0; x = (j&3), y = (j>>2), j < 16; j++) {
             if (isSolidAt(x, y, rotation) &&
                 ((x += posX) < 0 || x >= w || (y += posY) < 0 || y >= h || grid[y*w + x])) {
-              return 0;
+              return;
             }
           }
           currentX = posX;
