@@ -18,6 +18,9 @@
       Size: <span id="size"></span> (<span id="delta"></span>)
     </p>
     <pre id="code" style="margin: 40px auto; width: 128ch; height: 32em; line-height: 1em; background: #eee; border: 3px solid #800; overflow: visible; word-wrap: break-word;"></pre>
+    <p>
+      <a href="http://github.com/ttencate/tis">Tis on GitHub</a>
+    </p>
     <script>
       $.get('tis.min.js', function(code, textStatus, xhr) {
         var size = xhr.getResponseHeader('Content-Length');
@@ -28,8 +31,20 @@
             (size > target ? 'over' : 'under') + ' target')
             .css('color', size > target ? '#800' : '#080');
         $('#code').text(code);
-      });
+      }, 'text');
     </script>
     <script src="tis.js"></script>
+    <script>
+      var konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+      for (i in konamiCode) {
+        // Firing a native keyboard event is way harder than it should be,
+        // but we can fake it.
+        // http://stackoverflow.com/questions/961532/firing-a-keyboard-event-in-javascript
+        var e = document.createEvent('Event');
+        e.initEvent('keydown', true, true);
+        e.keyCode = konamiCode[i];
+        document.dispatchEvent(e);
+      }
+    </script>
   </body>
 </html>
