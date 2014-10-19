@@ -180,10 +180,10 @@
             }
           }
         }
-        music = makeAudio(tmp, location.hash != '#m');
+        music = makeAudio(tmp);
         music.loop = 1;
 
-        function makeAudio(wavArray, play) {
+        function makeAudio(wavArray) {
           tmp5 = wavArray.length;
           // https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
           wavArray.set([
@@ -204,7 +204,7 @@
             tmp5 & 0xFF, (tmp5 >> 8) & 0xff, tmp5 >> 16, 0 // data size
           ]);
           tmp5 = new Audio(URL.createObjectURL(new Blob([wavArray], {type: 'audio/wav'})));
-          play && tmp5.play();
+          tmp5.play();
           return tmp5;
         }
 
