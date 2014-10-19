@@ -165,17 +165,17 @@
         // delta is voice index; note that it is a string!
         for (delta in music) {
           music[delta] += music[delta] + thirdVerse[delta];
-          for (i = 44, j = 0; j < music[delta].length; j++) {
-            tmp3 = music[delta][charCodeAt](j) - (delta == 2 ? 64 : 32);
+          for (i = 44, j = 0; j < music[delta].length;) {
+            tmp3 = music[delta][charCodeAt](j++) - (delta == 2 ? 64 : 32);
             // 2 * pi * 55 Hz / 22050 Hz = 0.0156723443
             // But we divide out the pi because we don't use sin:
             // 2 * 55 Hz / 22050 Hz = 0.0049886621
             x = .00499 * math.pow(2, (tmp3 % 24 + (delta == 2 ? 0 : 27)) / 12);
             tmp2 = [15, 9, 9][delta];
-            for (y = 0; y < 4593 * [1, 3, 2, 4][~~(tmp3 / 24)]; y++) {
+            for (y = 0; y < 4593 * [1, 3, 2, 4][~~(tmp3 / 24)];) {
               // || works because we don't have the amplitude to reach sample value 0.
               // y * x is the phase times two: [0, 2).
-              tmp[i++] = (tmp[i] || 127) + (y * x % 2 < 1 ? tmp2 : -tmp2);
+              tmp[i++] = (tmp[i] || 127) + (y++ * x % 2 < 1 ? tmp2 : -tmp2);
               tmp2 *= 0.9999;
             }
           }
@@ -273,8 +273,8 @@
           lastFrame = now;
           if (state == 2) { // Game over
             if (stateTime-- > 4 && !(stateTime % 4)) {
-              for (x = 0; x < w; x++) {
-                grid[stateTime*w/4 + x] = 1 + ~~(math.random() * 7);
+              for (x = 0; x < w;) {
+                grid[stateTime*w/4 + x++] = 1 + ~~(math.random() * 7);
               }
               render();
             }
@@ -319,8 +319,8 @@
                 // -1 for left, 1 for right
                 tmp4 = 1 - 2 * (tmp2 == 17);
                 if (!keysPressed[tmp2]) {
-                  for (i = 0; i < 5; i++) {
-                    tmp = (currentTetromino == 1 ? wallKickTableI : wallKickTableRest)[charCodeAt](((currentRotation + 4 + (tmp4-1)/2))%4 * 5 + i) - 32;
+                  for (i = 0; i < 5;) {
+                    tmp = (currentTetromino == 1 ? wallKickTableI : wallKickTableRest)[charCodeAt](((currentRotation + 4 + (tmp4-1)/2))%4 * 5 + i++) - 32;
                     if (tryMove(currentX + tmp4 * ((tmp & 7) - 2), currentY + tmp4 * (2 - (tmp >> 3)), (currentRotation+4+tmp4) % 4)) {
                       playSoundEffect(80, 60, .0015);
                       break;
@@ -351,8 +351,8 @@
               linesClearing = [];
               rowNotFull:
               for (y = 0; y < h; y++) {
-                for (x = 0; x < w; x++) {
-                  if (!grid[y*w + x]) {
+                for (x = 0; x < w;) {
+                  if (!grid[y*w + x++]) {
                     continue rowNotFull;
                   }
                 }
