@@ -371,7 +371,7 @@
                 // tmp is a bitmask that tracks which tetrominos we've already added.
                 // bit 0 is just a sentinel, bits 1-7 correspond to tetrominos.
                 for (tmp = 1; tmp != 255;) {
-                  for (j = 0; tmp & (1 << j); j = math.ceil(math.random() * 7));
+                  for (j = 0; tmp & (1 << j); j = 1 + ~~(math.random() * 7));
                   tmp |= 1 << j;
                   bag.push(j);
                 }
