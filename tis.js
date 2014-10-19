@@ -160,12 +160,13 @@ document.addEventListener('DOMContentLoaded', function() {
     tmp2 & 0xFF, (tmp2 >> 8) & 0xff, tmp2 >> 16, 0 // data size
   ]);
   thirdVerse[2] += thirdVerse[2];
-  // delta is voice index
+  // delta is voice index; note that it is a string!
   for (delta in music) {
     music[delta] += music[delta] + thirdVerse[delta];
     for (i = 44, j = 0; j < music[delta].length; j++) {
       tmp3 = music[delta][charCodeAt](j) - (delta == 2 ? 64 : 32);
-      x = 2 * math.PI * (delta == 2 ? 55 : 261.63) * math.pow(2, (tmp3 % 24) / 12) / 22050;
+      // 2 * pi * 55 Hz / 22050 Hz = 0.0156723443
+      x = .0157 * math.pow(2, (tmp3 % 24 + (delta == 2 ? 0 : 27)) / 12);
       tmp2 = [.2, .1, .1][delta];
       for (y = 0; y < 4593 * [1, 3, 2, 4][math.floor(tmp3 / 24)]; y++) {
         tmp[i++] += 127 * ((delta == 0) + tmp2 * (math.sin(y * x) > 0 ? 1 : -1));
