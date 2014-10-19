@@ -17,8 +17,9 @@
     if (nextCodeChar > 9) {
       (function() {
         var
+            win = window,
+
             createElement = 'createElement',
-            getElementById = 'getElementById',
             removeEventListener = 'removeEventListener',
             keyup = 'keyup',
 
@@ -219,7 +220,7 @@
                 isSolidAt(x-currentX, y-tmp, currentRotation) ? currentTetromino :
                 isSolidAt(x-currentX, y-currentY, currentRotation) ? currentTetromino + 8 :
                 grid[i] || 0;
-              if (tmp3 = doc[getElementById]('tis-' + i)) {
+              if (tmp3 = win['tis-' + i]) {
                 tmp3 = tmp3.style;
                 tmp3.background = '#' + (
                     state == 1 && stateTime % 4 < 2 && linesClearing[y] ?
@@ -231,7 +232,7 @@
           }
           currentY = tmp;
           tmp = divStyleMargin + '0;text-align:right;font-size:150%">';
-          doc[getElementById]('tis-status').innerHTML = 'Score' + tmp + score + divEnd + 'Lines' + tmp + lines + divEnd + 'Level' + tmp + level + divEnd;
+          win['tis-status'].innerHTML = 'Score' + tmp + score + divEnd + 'Lines' + tmp + lines + divEnd + 'Level' + tmp + level + divEnd;
         }
 
         function tryMove(posX, posY, rotation, doNotRender) {
