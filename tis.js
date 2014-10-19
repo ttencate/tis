@@ -25,6 +25,8 @@
 
             math = Math,
 
+            uint32Array = Uint32Array,
+
             music = [
               // http://www.theoreticallycorrect.com/Helmholtz-Pitch-Numbering/
               //
@@ -159,13 +161,12 @@
 
         // Music!
         // 4593 samples/eighth * 8 eighths/bar * 24 bars = 881856 samples
-        // 881856 samples + 44 header bytes = 881900 bytes
-        tmp = new Uint8Array(881900);
+        tmp = new Uint8Array(881856);
         thirdVerse[2] += thirdVerse[2];
         // delta is voice index; note that it is a string!
         for (delta in music) {
           music[delta] += music[delta] + thirdVerse[delta];
-          for (i = 44, j = 0; j < music[delta].length;) {
+          for (i = 0, j = 0; j < music[delta].length;) {
             tmp3 = music[delta][charCodeAt](j++) - (delta == 2 ? 64 : 32);
             // 2 * pi * 55 Hz / 22050 Hz = 0.0156723443
             // But we divide out the pi because we don't use sin:
@@ -186,24 +187,31 @@
         function makeAudio(wavArray) {
           tmp5 = wavArray.length;
           // https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
-          wavArray.set([
-            0x52, 0x49, 0x46, 0x46, // "RIFF"
-            (tmp5 - 36) & 0xff, ((tmp5 - 36) >> 8) & 0xff, ((tmp5 - 36) >> 16), 0, // data size + 36 (little-endian)
-            0x57, 0x41, 0x56, 0x45, // "WAVE"
-            
-            0x66, 0x6d, 0x74, 0x20, // "fmt "
-            16, 0, 0, 0, // size of this subchunk
-            1, 0, // PCM
-            1, 0, // mono
-            34, 86, 0, 0, // sample rate: 22050 Hz
-            34, 86, 0, 0, // byte rate: 22050 bytes/s
-            1, 0, // block align
-            8, 0, // bits per sample
-
-            0x64, 0x61, 0x74, 0x61, // "data"
-            tmp5 & 0xFF, (tmp5 >> 8) & 0xff, tmp5 >> 16, 0 // data size
-          ]);
-          tmp5 = new Audio(URL.createObjectURL(new Blob([wavArray], {type: 'audio/wav'})));
+          //
+          // wavArray.set([
+          //   0x52, 0x49, 0x46, 0x46, // "RIFF"
+          //   (tmp5 + 36) & 0xff, ((tmp5 + 36) >> 8) & 0xff, ((tmp5 + 36) >> 16), 0, // data size + 36 (little-endian)
+          //   0x57, 0x41, 0x56, 0x45, // "WAVE"
+          //
+          //   0x66, 0x6d, 0x74, 0x20, // "fmt "
+          //   16, 0, 0, 0, // size of this subchunk
+          //   1, 0, // PCM
+          //   1, 0, // mono
+          //   34, 86, 0, 0, // sample rate: 22050 Hz
+          //   34, 86, 0, 0, // byte rate: 22050 bytes/s
+          //   1, 0, // block align
+          //   8, 0, // bits per sample
+          //
+          //   0x64, 0x61, 0x74, 0x61, // "data"
+          //   tmp5 & 0xFF, (tmp5 >> 8) & 0xff, tmp5 >> 16, 0 // data size
+          // ]);
+          tmp5 = new Audio(URL.createObjectURL(new Blob([
+            'RIFF',
+            new uint32Array([tmp5 + 36]),
+            'WAVEfmt ',
+            new uint32Array([16, 65537, 22050, 22050, 524289, 0x61746164, tmp5]),
+            wavArray
+          ], {type: 'audio/wav'})));
           tmp5.play();
           return tmp5;
         }
