@@ -10,11 +10,10 @@
       keyCode = 'keyCode',
       keydown = 'keydown',
 
-      konamiCode = "&&((%'%'BA",
       nextCodeChar = 0;
 
   doc[addEventListener](keydown, function(e) {
-    nextCodeChar = e[keyCode] == konamiCode[charCodeAt](nextCodeChar) ? nextCodeChar + 1 : 0;
+    nextCodeChar = e[keyCode] == "&&((%'%'BA"[charCodeAt](nextCodeChar) ? nextCodeChar + 1 : 0;
     if (nextCodeChar > 9) {
       (function() {
         var
