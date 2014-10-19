@@ -62,7 +62,7 @@
             s = w*h+20,
 
             // x I J L O S T Z
-            colors = '080808 0dd 36f e80 dd0 0e0 c0c f22'.split(' '),
+            colors = '08080890dd936f9e809dd090e09c0c9f22'.split(9),
 
             // http://tetris.wikia.com/wiki/SRS
             //
