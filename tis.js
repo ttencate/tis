@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // 2 * pi * 55 Hz / 22050 Hz = 0.0156723443
       x = .0157 * math.pow(2, (tmp3 % 24 + (delta == 2 ? 0 : 27)) / 12);
       tmp2 = [15, 9, 9][delta];
-      for (y = 0; y < 4593 * [1, 3, 2, 4][math.floor(tmp3 / 24)]; y++) {
+      for (y = 0; y < 4593 * [1, 3, 2, 4][~~(tmp3 / 24)]; y++) {
         // This works because we don't have the amplitude to reach sample value 0.
         tmp[i++] = (tmp[i] || 127) + tmp2 * (math.sin(y * x) > 0 ? 1 : -1);
         tmp2 *= 0.9999;
@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
       case 2:
         if (stateTime-- > 4 && !(stateTime % 4)) {
           for (x = 0; x < w; x++) {
-            grid[stateTime*w/4 + x] = 1 + math.floor(math.random() * 7);
+            grid[stateTime*w/4 + x] = 1 + ~~(math.random() * 7);
           }
           render();
         }
@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           score += [0, 100, 300, 500, 800][tmp2] * level;
           lines += tmp2;
-          level = 1 + math.floor(lines / 10);
+          level = 1 + ~~(lines / 10);
 
           // Shuffle bag if needed
           if (bag.length < 2) {
