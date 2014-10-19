@@ -268,7 +268,6 @@
             render();
           } else { // state == 0: Regular gameplay
             // Handle keyboard input
-            tmp4 = 1;
             for (tmp2 in keysPressed) {
               if (tmp2 == 27) { // Quit
                 doc.body.removeChild(html);
