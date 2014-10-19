@@ -249,137 +249,130 @@
           delta = (now - lastFrame) / 1e3 || 0;
           if (delta > .1) delta = .1;
           lastFrame = now;
-          switch (state) {
-            case 2:
-              if (stateTime-- > 4 && !(stateTime % 4)) {
-                for (x = 0; x < w; x++) {
-                  grid[stateTime*w/4 + x] = 1 + ~~(math.random() * 7);
-                }
-                render();
-              }
-              break;
-
-            case 1:
-              if (--stateTime < 0) {
-                for (y in linesClearing) {
-                  for (i = y*w+w-1; i >= 0; i--) {
-                    grid[i] = grid[i-w];
-                  }
-                }
-                state = 0;
+          if (state == 2) { // Game over
+            if (stateTime-- > 4 && !(stateTime % 4)) {
+              for (x = 0; x < w; x++) {
+                grid[stateTime*w/4 + x] = 1 + ~~(math.random() * 7);
               }
               render();
-              break;
-
-            case 0:
-              // Handle keyboard input
-              tmp4 = 1;
-              for (tmp2 in keysPressed) {
-                switch (parseInt(tmp2)) {
-                  case 27:
-                    // Quit
-                    doc.body.removeChild(html);
-                    doc[removeEventListener]('keydown', onKeyDown);
-                    doc[removeEventListener]('keyup', onKeyUp);
-                    music.pause();
-                    return;
-                  case 37:
-                    // Left
-                    if (keysPressed[tmp2] < 0) break;
-                    // TODO tweak left/right key repeat
-                    keysPressed[tmp2] -= .15;
-                    tryMove(currentX - 1, currentY, currentRotation);
-                    break;
-                  case 39:
-                    // Right
-                    if (keysPressed[tmp2] < 0) break;
-                    keysPressed[tmp2] -= .15;
-                    tryMove(currentX + 1, currentY, currentRotation);
-                    break;
-                  case 38:
-                    // Up: hard drop
-                    if (keysPressed[tmp2]) break;
-                    while (tryMove(currentX, currentY + 1, currentRotation));
-                    lockTimer = 9;
-                    break;
-                  case 90: // z
-                  case 186: // ; (dvorak)
-                    // Rotate left
-                    tmp4 = -1; // 1 for right, -1 for left
-                  case 88: // x
-                  case 81: // q (dvorak)
-                    // Rotate right
-                    if (!keysPressed[tmp2]) {
-                      for (i = 0; i < 5; i++) {
-                        tmp = (currentTetromino == 1 ? wallKickTableI : wallKickTableRest)[charCodeAt](((currentRotation + 4 + (tmp4-1)/2))%4 * 5 + i) - 32;
-                        if (tryMove(currentX + tmp4 * ((tmp & 7) - 2), currentY + tmp4 * (2 - (tmp >> 3)), (currentRotation+4+tmp4) % 4)) {
-                          break;
-                        }
-                      }
-                    }
-                    break;
+            }
+          } else if (state == 1) { // Clearing
+            if (--stateTime < 0) {
+              for (y in linesClearing) {
+                for (i = y*w+w-1; i >= 0; i--) {
+                  grid[i] = grid[i-w];
                 }
-                keysPressed[tmp2] += delta;
               }
-
-              // Apply gravity
-              gravityTimer += math.max(
-                  keysPressed[40] ? 0.2 : 0,
-                  delta * math.pow(1.23, level));
-              if (gravityTimer > 1) {
-                gravityTimer = 0;
-                tryMove(currentX, currentY + 1, currentRotation);
+              state = 0;
+            }
+            render();
+          } else { // state == 0: Regular gameplay
+            // Handle keyboard input
+            tmp4 = 1;
+            for (tmp2 in keysPressed) {
+              if (tmp2 == 27) { // Quit
+                doc.body.removeChild(html);
+                doc[removeEventListener]('keydown', onKeyDown);
+                doc[removeEventListener]('keyup', onKeyUp);
+                music.pause();
+                return;
               }
-
-              if (!currentTetromino || lockTimer > 1) {
-                // Lock it in place
-                render();
-                for (i in grid) grid[i] = shadowGrid[i];
-
-                // Find full rows
-                tmp2 = 0;
-                linesClearing = [];
-                for (y = 0; y < h; y++) {
-                  tmp = 1;
-                  for (x = 0; x < w; x++) {
-                    if (!grid[y*w + x]) {
-                      tmp = 0;
+              if (tmp2 == 37) { // Left
+                if (keysPressed[tmp2] >= 0) {
+                  // TODO tweak left/right key repeat
+                  keysPressed[tmp2] -= .15;
+                  tryMove(currentX - 1, currentY, currentRotation);
+                }
+              }
+              if (tmp2 == 39) { // Right
+                // Right
+                if (keysPressed[tmp2] >= 0) {
+                  keysPressed[tmp2] -= .15;
+                  tryMove(currentX + 1, currentY, currentRotation);
+                }
+              }
+              if (tmp2 == 38) {
+                // Up: hard drop
+                if (keysPressed[tmp2]) break;
+                while (tryMove(currentX, currentY + 1, currentRotation));
+                lockTimer = 9;
+              }
+              if (
+                  tmp2 == 90 || tmp2 == 186 || // Z or ; (dvorak)
+                  tmp2 == 88 ||tmp2 == 81) { // X or Q (dvorak)
+                // Rotate
+                // -1 for left, 1 for right
+                tmp4 = (tmp2 == 90 || tmp2 == 186) ? -1 : 1;
+                if (!keysPressed[tmp2]) {
+                  for (i = 0; i < 5; i++) {
+                    tmp = (currentTetromino == 1 ? wallKickTableI : wallKickTableRest)[charCodeAt](((currentRotation + 4 + (tmp4-1)/2))%4 * 5 + i) - 32;
+                    if (tryMove(currentX + tmp4 * ((tmp & 7) - 2), currentY + tmp4 * (2 - (tmp >> 3)), (currentRotation+4+tmp4) % 4)) {
                       break;
                     }
                   }
-                  if (tmp) {
-                    linesClearing[y] = 1;
-                    tmp2++;
-                    state = 1;
-                    stateTime = 6;
-                  }
                 }
-                score += [0, 100, 300, 500, 800][tmp2] * level;
-                lines += tmp2;
-                level = 1 + ~~(lines / 10);
-
-                // Shuffle bag if needed
-                if (bag.length < 2) {
-                  // tmp is a bitmask that tracks which tetrominos we've already added.
-                  // bit 0 is just a sentinel, bits 1-7 correspond to tetrominos.
-                  for (tmp = 1; tmp != 255;) {
-                    for (j = 0; tmp & (1 << j); j = math.ceil(math.random() * 7));
-                    tmp |= 1 << j;
-                    bag.push(j);
-                  }
-                }
-
-                // Spawn new tetromino
-                currentTetromino = bag.shift();
-                gravityTimer = 0;
-                if (!tryMove(3, 0, 0)) {
-                  // Game over
-                  state = 2;
-                  stateTime = 4*h;
-                }
-                render();
               }
-              lockTimer += delta;
+              keysPressed[tmp2] += delta;
+            }
+
+            // Apply gravity
+            gravityTimer += math.max(
+                keysPressed[40] ? 0.2 : 0,
+                delta * math.pow(1.23, level));
+            if (gravityTimer > 1) {
+              gravityTimer = 0;
+              tryMove(currentX, currentY + 1, currentRotation);
+            }
+
+            if (!currentTetromino || lockTimer > 1) {
+              // Lock it in place
+              render();
+              for (i in grid) grid[i] = shadowGrid[i];
+
+              // Find full rows
+              tmp2 = 0;
+              linesClearing = [];
+              for (y = 0; y < h; y++) {
+                tmp = 1;
+                for (x = 0; x < w; x++) {
+                  if (!grid[y*w + x]) {
+                    tmp = 0;
+                    break;
+                  }
+                }
+                if (tmp) {
+                  linesClearing[y] = 1;
+                  tmp2++;
+                  state = 1;
+                  stateTime = 6;
+                }
+              }
+              score += [0, 100, 300, 500, 800][tmp2] * level;
+              lines += tmp2;
+              level = 1 + ~~(lines / 10);
+
+              // Shuffle bag if needed
+              if (bag.length < 2) {
+                // tmp is a bitmask that tracks which tetrominos we've already added.
+                // bit 0 is just a sentinel, bits 1-7 correspond to tetrominos.
+                for (tmp = 1; tmp != 255;) {
+                  for (j = 0; tmp & (1 << j); j = math.ceil(math.random() * 7));
+                  tmp |= 1 << j;
+                  bag.push(j);
+                }
+              }
+
+              // Spawn new tetromino
+              currentTetromino = bag.shift();
+              gravityTimer = 0;
+              if (!tryMove(3, 0, 0)) {
+                // Game over
+                state = 2;
+                stateTime = 4*h;
+              }
+              render();
+            }
+            lockTimer += delta;
           }
 
           window.requestAnimationFrame(frame);
