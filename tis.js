@@ -20,6 +20,7 @@
         var
             createElement = 'createElement',
             getElementById = 'getElementById',
+            removeEventListener = 'removeEventListener',
 
             math = Math,
 
@@ -121,7 +122,7 @@
                 '<div style="margin:20px 40px;font-size:80%;color:#888">' +
                   '<b><a href="http://github.com/ttencate/tis" style="color:inherit">Tis</a></b>: 4 kB of JavaScript<br><br>' +
                   'Left/right: move | Z/X: rotate<br>' +
-                  'Down: soft drop | Up: hard drop | M: music' +
+                  'Down/up: soft/hard drop | M: music | Esc: quit' +
                 '</div>' +
                 '<div style="float:right;margin:0 20px;width:80px;color:#eee;font:15px sans-serif">' +
                   '<div id="tis-status"></div>' +
@@ -149,7 +150,7 @@
               '</div>';
         tmp = doc[createElement]('div');
         tmp.innerHTML = html;
-        doc.body.appendChild(tmp);
+        doc.body.appendChild(html = tmp);
 
         // Music!
         tmp2 = 881856; // 4593 samples/eighth * 8 eighths/bar * 24 bars
@@ -191,6 +192,7 @@
             }
           }
         }
+        // TODO https://developer.mozilla.org/en/docs/Web/API/HTMLAudioElement syntax
         music = doc[createElement]('audio');
         music.src = URL.createObjectURL(new Blob([tmp], {type: 'audio/wav'}));
         music.loop = 1;
@@ -276,6 +278,13 @@
               tmp4 = 1;
               for (tmp2 in keysPressed) {
                 switch (parseInt(tmp2)) {
+                  case 27:
+                    // Quit
+                    doc.body.removeChild(html);
+                    doc[removeEventListener]('keydown', onKeyDown);
+                    doc[removeEventListener]('keyup', onKeyUp);
+                    music.pause();
+                    return;
                   case 37:
                     // Left
                     if (keysPressed[tmp2] < 0) break;
@@ -379,7 +388,7 @@
         }
         frame(0);
 
-        doc[addEventListener]('keydown', function onKeyDown(e) {
+        function onKeyDown(e) {
           tmp = e[keyCode];
           if (tmp == 77) {
             if (music.paused) music.play(); else music.pause();  
@@ -389,13 +398,17 @@
           }
           // 37-40: arrow keys
           // 81, 88, 90, 186: rotation keys
-          if (tmp > 36 && tmp < 41 || tmp == 88 || tmp == 88 || tmp == 90 || tmp == 186) {
+          if (tmp > 36 && tmp < 41 || tmp == 81 || tmp == 88 || tmp == 90 || tmp == 186) {
             e.preventDefault();
           }
-        });
-        doc[addEventListener]('keyup', function onKeyUp(e) {
+        }
+
+        function onKeyUp(e) {
           delete keysPressed[e[keyCode]];
-        });
+        }
+
+        doc[addEventListener]('keydown', onKeyDown);
+        doc[addEventListener]('keyup', onKeyUp);
       })();
     }
   });
