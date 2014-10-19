@@ -281,18 +281,14 @@
                 music.pause();
                 return;
               }
-              if (tmp2 == 37) { // Left
+              if (tmp2 == 37 || tmp2 == 39) {
+                // Move
+                // -1 for left, 1 for right
+                tmp4 = 1 - 2 * (tmp2 == 37);
                 if (keysPressed[tmp2] >= 0) {
                   // TODO tweak left/right key repeat
                   keysPressed[tmp2] -= .15;
-                  tryMove(currentX - 1, currentY, currentRotation);
-                }
-              }
-              if (tmp2 == 39) { // Right
-                // Right
-                if (keysPressed[tmp2] >= 0) {
-                  keysPressed[tmp2] -= .15;
-                  tryMove(currentX + 1, currentY, currentRotation);
+                  tryMove(currentX + tmp4, currentY, currentRotation);
                 }
               }
               if (tmp2 == 38) {
