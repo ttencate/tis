@@ -9,6 +9,17 @@
       h1, p {
         text-align: center;
       }
+      pre {
+        margin: 40px auto;
+        width: 128ch;
+        height: 32em;
+        line-height: 1em;
+        background: #eee;
+        border: 3px solid #800;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        word-break: break-all;
+      }
     </style>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   </head>
@@ -20,7 +31,8 @@
     <p>
       Size: <span id="size"></span> (<span id="delta"></span>)
     </p>
-    <pre id="code" style="margin: 40px auto; width: 128ch; height: 32em; line-height: 1em; background: #eee; border: 3px solid #800; overflow: visible; word-wrap: break-word;"></pre>
+    <pre id="code"></pre>
+    <p>If you quit Tis, type the Konami code to get it back.</p>
     <script>
       $.get('tis.min.js', function(code, textStatus, xhr) {
         var size = xhr.getResponseHeader('Content-Length');
