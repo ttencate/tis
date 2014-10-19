@@ -117,26 +117,28 @@
 
             i, j, x, y, tmp, tmp2, tmp3, tmp4,
 
+            divEnd = '</div>',
+
             html =
               '<div style="position:fixed;width:360px;left:50%;top:50%;margin:-270px -180px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px">' +
                 '<div style="margin:20px 40px;font-size:80%;color:#888">' +
                   '<b><a href="http://github.com/ttencate/tis" style="color:inherit">Tis</a></b>: 4 kB of JavaScript<br><br>' +
                   'Left/right: move | Z/X: rotate<br>' +
                   'Down/up: soft/hard drop | M: music | Esc: quit' +
-                '</div>' +
+                divEnd +
                 '<div style="float:right;margin:0 20px;width:80px;color:#eee;font:15px sans-serif">' +
-                  '<div id="tis-status"></div>' +
+                  '<div id="tis-status">' + divEnd +
                   'Next<div style="margin:8px 0;height:40px;box-shadow:0 0 9px #000;">'
             ;
 
-        tmp2 = '" style="width:20px;height:20px;float:left;box-shadow:-2px -2px 8px rgba(0,0,0,0.4) inset, 0 0 2px #000 inset;"></div>';
+        tmp2 = '" style="width:20px;height:20px;float:left;box-shadow:-2px -2px 8px rgba(0,0,0,0.4) inset, 0 0 2px #000 inset;">' + divEnd;
         for (i = 220; i < s; i++) {
           if (i % w < 4) {
             html += '<div id="tis-' + i + tmp2;
           }
         }
-        html +=   '</div>' +
-                '</div>' +
+        html +=   divEnd +
+                divEnd +
                 '<div style="background:#000;width:200px;height:400px;box-shadow:0 0 9px #222;margin:0 40px 40px">';
 
         for (i = 0; i < s; i++) {
@@ -146,8 +148,8 @@
           }
         }
 
-        html += '</div>' +
-              '</div>';
+        html += divEnd +
+              divEnd;
         tmp = doc[createElement]('div');
         tmp.innerHTML = html;
         doc.body.appendChild(html = tmp);
@@ -227,7 +229,7 @@
           }
           currentY = tmp;
           tmp = '<div style="text-align:right;font-size:150%">';
-          doc[getElementById]('tis-status').innerHTML = 'Score' + tmp + score + '</div>Lines' + tmp + lines + '</div>Level' + tmp + level + '</div>';
+          doc[getElementById]('tis-status').innerHTML = 'Score' + tmp + score + divEnd + 'Lines' + tmp + lines + divEnd + 'Level' + tmp + level + divEnd;
         }
 
         function tryMove(posX, posY, rotation, doNotRender) {
