@@ -297,11 +297,11 @@
                 lockTimer = 9;
               }
               if (
-                  tmp2 == 90 || tmp2 == 186 || // Z or ; (dvorak)
-                  tmp2 == 88 ||tmp2 == 81) { // X or Q (dvorak)
+                  (tmp4 = (tmp2 == 90 || tmp2 == 186)) || // Z or ; (dvorak)
+                  tmp2 == 88 || tmp2 == 81) { // X or Q (dvorak)
                 // Rotate
                 // -1 for left, 1 for right
-                tmp4 = (tmp2 == 90 || tmp2 == 186) ? -1 : 1;
+                tmp4 = 1 - 2*tmp4;
                 if (!keysPressed[tmp2]) {
                   for (i = 0; i < 5; i++) {
                     tmp = (currentTetromino == 1 ? wallKickTableI : wallKickTableRest)[charCodeAt](((currentRotation + 4 + (tmp4-1)/2))%4 * 5 + i) - 32;
