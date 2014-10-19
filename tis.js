@@ -286,8 +286,7 @@
                 // -1 for left, 1 for right
                 tmp4 = 1 - 2 * (tmp2 == 37);
                 if (keysPressed[tmp2] >= 0) {
-                  // TODO tweak left/right key repeat
-                  keysPressed[tmp2] -= .15;
+                  keysPressed[tmp2] -= keysPressed[tmp2] ? .05 : .15;
                   tryMove(currentX + tmp4, currentY, currentRotation);
                 }
               }
