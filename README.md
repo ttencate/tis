@@ -12,10 +12,13 @@ then be invoked as an easter egg using the Konami code.
 Features
 --------
 
+Tis has nearly all of the features you might expect from a modern Tetris:
+
 - All seven tetromino shapes.
 - Block movement and rotation.
 - Key repeats.
 - Soft and hard drop.
+- Lock delay.
 - Line clearing.
 - Look-ahead to the upcoming block.
 - Wall kicks.
