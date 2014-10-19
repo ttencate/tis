@@ -116,7 +116,7 @@
             keysPressed = [],
             lastFrame,
 
-            i, j, x, y, tmp, tmp2, tmp3, tmp4,
+            i, j, x, y, tmp, tmp2, tmp3, tmp4, tmp5,
 
             divStyleMargin = '<div style="margin:',
             divEnd = '</div>',
@@ -158,26 +158,9 @@
         doc.body.appendChild(html = tmp);
 
         // Music!
-        tmp2 = 881856; // 4593 samples/eighth * 8 eighths/bar * 24 bars
-        tmp = new Uint8Array(tmp2 + 44);
-        // https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
-        tmp.set([
-          0x52, 0x49, 0x46, 0x46, // "RIFF"
-          (tmp2 + 36) & 0xff, ((tmp2 + 36) >> 8) & 0xff, ((tmp2 + 36) >> 16), 0, // data size + 36 (little-endian)
-          0x57, 0x41, 0x56, 0x45, // "WAVE"
-          
-          0x66, 0x6d, 0x74, 0x20, // "fmt "
-          16, 0, 0, 0, // size of this subchunk
-          1, 0, // PCM
-          1, 0, // mono
-          34, 86, 0, 0, // sample rate: 22050 Hz
-          34, 86, 0, 0, // byte rate: 22050 bytes/s
-          1, 0, // block align
-          8, 0, // bits per sample
-
-          0x64, 0x61, 0x74, 0x61, // "data"
-          tmp2 & 0xFF, (tmp2 >> 8) & 0xff, tmp2 >> 16, 0 // data size
-        ]);
+        // 4593 samples/eighth * 8 eighths/bar * 24 bars = 881856 samples
+        // 881856 samples + 44 header bytes = 881900 bytes
+        tmp = new Uint8Array(881900);
         thirdVerse[2] += thirdVerse[2];
         // delta is voice index; note that it is a string!
         for (delta in music) {
@@ -197,9 +180,43 @@
             }
           }
         }
-        music = new Audio(URL.createObjectURL(new Blob([tmp], {type: 'audio/wav'})));
+        music = makeAudio(tmp, location.hash != '#m');
         music.loop = 1;
-        if (location.hash != '#m') music.play();
+
+        // function playSoundEffect(amplitude, interval, duration) {
+        //   tmp5 = new Uint8Array(duration);
+        //   for (i in tmp5) {
+        //     tmp5[i] = 127 + amplitude * (i%interval < interval / 2 ? -1 : 1);
+        //     amplitude *= .999;
+        //   }
+        //   makeAudio(tmp5, 1);
+        // }
+        // playSoundEffect(100, 10, 2e3);
+
+        function makeAudio(wavArray, play) {
+          tmp5 = wavArray.length;
+          // https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
+          wavArray.set([
+            0x52, 0x49, 0x46, 0x46, // "RIFF"
+            (tmp5 - 36) & 0xff, ((tmp5 - 36) >> 8) & 0xff, ((tmp5 - 36) >> 16), 0, // data size + 36 (little-endian)
+            0x57, 0x41, 0x56, 0x45, // "WAVE"
+            
+            0x66, 0x6d, 0x74, 0x20, // "fmt "
+            16, 0, 0, 0, // size of this subchunk
+            1, 0, // PCM
+            1, 0, // mono
+            34, 86, 0, 0, // sample rate: 22050 Hz
+            34, 86, 0, 0, // byte rate: 22050 bytes/s
+            1, 0, // block align
+            8, 0, // bits per sample
+
+            0x64, 0x61, 0x74, 0x61, // "data"
+            tmp5 & 0xFF, (tmp5 >> 8) & 0xff, tmp5 >> 16, 0 // data size
+          ]);
+          tmp5 = new Audio(URL.createObjectURL(new Blob([wavArray], {type: 'audio/wav'})));
+          play && tmp5.play();
+          return tmp5;
+        }
 
         function isSolidAt(x, y, rotation, tetromino) {
           return currentTetromino &&
