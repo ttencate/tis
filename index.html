@@ -35,7 +35,8 @@
     <p>If you quit Tis, type the <a href="https://en.wikipedia.org/wiki/Konami_Code">Konami code</a> to get it back.</p>
     <script>
       $.get('tis.min.js', function(code, textStatus, xhr) {
-        var size = xhr.getResponseHeader('Content-Length');
+        // These are actually characters, not bytes. But we don't use any Unicode.
+        var size = code.length;
         var target = 4096;
         $('#size').text(size);
         $('#delta').text(

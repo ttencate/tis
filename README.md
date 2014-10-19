@@ -1,6 +1,8 @@
 Tis
 ===
 
+[**Play Tis here**, with the source code in the background.](http://ttencate.github.io/tis)
+
 Tis is a self-contained Tetris™ clone in 4 kB of pure JavaScript (ECMAScript
 5). This includes code to generate the necessary HTML markup and inline CSS.
 
