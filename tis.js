@@ -377,7 +377,7 @@
             lockTimer += delta;
           }
 
-          window.requestAnimationFrame(frame);
+          requestAnimationFrame(frame);
         }
         frame(0);
 
