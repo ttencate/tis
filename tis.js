@@ -328,8 +328,7 @@
             }
 
             if (!currentTetromino || lockTimer > 1) {
-              // Lock it in place
-              render();
+              // Lock it in place; we assume that the render was just done
               for (i in grid) grid[i] = shadowGrid[i];
 
               // Find full rows
@@ -370,10 +369,10 @@
               gravityTimer = 0;
               if (!tryMove(3, 0, 0)) {
                 // Game over
+                currentTetromino = 0;
                 state = 2;
                 stateTime = 4*h;
               }
-              render();
             }
             lockTimer += delta;
           }
