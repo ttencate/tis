@@ -10,11 +10,12 @@
       keyCode = 'keyCode',
       keydown = 'keydown',
 
-      nextCodeChar = 0;
+      nextCodeChar = 0,
+      tmp2;
 
   doc[addEventListener](keydown, function(e) {
     nextCodeChar = e[keyCode] == "&&((%'%'BA"[charCodeAt](nextCodeChar) ? nextCodeChar + 1 : 0;
-    if (nextCodeChar > 9) {
+    if (tmp2 != 27 && nextCodeChar > 9) {
       (function() {
         var
             win = window,
@@ -116,7 +117,7 @@
             keysPressed = [],
             lastFrame,
 
-            i, j, x, y, tmp, tmp2, tmp3, tmp4, tmp5,
+            i, j, x, y, tmp, tmp3, tmp4, tmp5,
 
             divStyleMargin = '<div style="margin:',
             divEnd = '</div>',
@@ -125,7 +126,7 @@
             html =
               divStyleMargin + '-270px -180px;position:fixed;width:360px;left:50%;top:50%;font:13px sans-serif;background:rgba(0,0,0,.8)' + boxShadow + '0 0 30px #000;border-radius:30px">' +
                 divStyleMargin + '20px 40px;color:#888">' +
-                  '<b><a href="http://github.com/ttencate/tis" style="color:inherit">Tis</a></b>: Tetris in a mere 4 kB of JavaScript<br><br>' +
+                  '<b><a href="http://github.com/ttencate/tis" style="color:inherit">Tis</a></b>: Tetris in 4 kB of JavaScript<br><br>' +
                   'Left/right: move || Shift/Ctrl: rotate<br>' +
                   'Down/up: soft/hard drop || M: music || Esc: quit' +
                 divEnd +
