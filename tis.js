@@ -130,10 +130,10 @@
                 divEnd +
                 divStyleMargin + '0 20px;float:right;width:80px;color:#eee;font-size:15px">' +
                   '<div id="tis-status">' + divEnd +
-                  'Next' + divStyleMargin + '8px 0;height:40px' + boxShadow + '0 0 9px #000;">'
+                  'Next' + divStyleMargin + '8px 0;height:40px' + boxShadow + '0 0 9px #000">'
             ;
 
-        tmp2 = divStyleMargin + '0;width:20px;height:20px;float:left' + boxShadow + '-2px -2px 8px rgba(0,0,0,.4) inset,0 0 2px #000 inset;" id="tis-';
+        tmp2 = divStyleMargin + '0;width:20px;height:20px;float:left' + boxShadow + '-2px -2px 8px rgba(0,0,0,.4) inset,0 0 2px #000 inset" id="tis-';
         for (i = 220; i < s; i++) {
           if (i % w < 4) {
             html += tmp2 + i + '">' + divEnd;
