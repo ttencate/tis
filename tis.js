@@ -329,20 +329,17 @@
               // Find full rows
               tmp2 = 0;
               linesClearing = [];
+              rowNotFull:
               for (y = 0; y < h; y++) {
-                tmp = 1;
                 for (x = 0; x < w; x++) {
                   if (!grid[y*w + x]) {
-                    tmp = 0;
-                    break;
+                    continue rowNotFull;
                   }
                 }
-                if (tmp) {
-                  linesClearing[y] = 1;
-                  tmp2++;
-                  state = 1;
-                  stateTime = 6;
-                }
+                linesClearing[y] = 1;
+                tmp2++;
+                state = 1;
+                stateTime = 6;
               }
               score += 100 * [0, 1, 3, 5, 8][tmp2] * level;
               lines += tmp2;
