@@ -346,7 +346,7 @@
                   stateTime = 6;
                 }
               }
-              score += [0, 100, 300, 500, 800][tmp2] * level;
+              score += 100 * [0, 1, 3, 5, 8][tmp2] * level;
               lines += tmp2;
               level = 1 + ~~(lines / 10);
 
