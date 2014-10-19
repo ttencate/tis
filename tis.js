@@ -25,8 +25,6 @@
 
             math = Math,
 
-            uint32Array = Uint32Array,
-
             music = [
               // http://www.theoreticallycorrect.com/Helmholtz-Pitch-Numbering/
               //
@@ -207,9 +205,7 @@
           // ]);
           tmp5 = new Audio(URL.createObjectURL(new Blob([
             'RIFF',
-            new uint32Array([tmp5 + 36]),
-            'WAVEfmt ',
-            new uint32Array([16, 65537, 22050, 22050, 524289, 0x61746164, tmp5]),
+            new Uint32Array([tmp5 + 36, 0x45564157, 0x20746d66, 16, 65537, 22050, 22050, 524289, 0x61746164, tmp5]),
             wavArray
           ], {type: 'audio/wav'})));
           tmp5.play();
