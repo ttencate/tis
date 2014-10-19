@@ -166,11 +166,14 @@ document.addEventListener('DOMContentLoaded', function() {
     for (i = 44, j = 0; j < music[delta].length; j++) {
       tmp3 = music[delta][charCodeAt](j) - (delta == 2 ? 64 : 32);
       // 2 * pi * 55 Hz / 22050 Hz = 0.0156723443
-      x = .0157 * math.pow(2, (tmp3 % 24 + (delta == 2 ? 0 : 27)) / 12);
+      // But we divide out the pi because we don't use sin:
+      // 2 * 55 Hz / 22050 Hz = 0.0049886621
+      x = .00499 * math.pow(2, (tmp3 % 24 + (delta == 2 ? 0 : 27)) / 12);
       tmp2 = [15, 9, 9][delta];
       for (y = 0; y < 4593 * [1, 3, 2, 4][~~(tmp3 / 24)]; y++) {
-        // This works because we don't have the amplitude to reach sample value 0.
-        tmp[i++] = (tmp[i] || 127) + tmp2 * (math.sin(y * x) > 0 ? 1 : -1);
+        // || works because we don't have the amplitude to reach sample value 0.
+        // y * x is the phase times two: [0, 2).
+        tmp[i++] = (tmp[i] || 127) + (y * x % 2 < 1 ? tmp2 : -tmp2);
         tmp2 *= 0.9999;
       }
     }
