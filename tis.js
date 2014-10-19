@@ -126,7 +126,7 @@
               divStyleMargin + '-270px -180px;position:fixed;width:360px;left:50%;top:50%;font:13px sans-serif;background:rgba(0,0,0,.8)' + boxShadow + '0 0 30px #000;border-radius:30px">' +
                 divStyleMargin + '20px 40px;color:#888">' +
                   '<b><a href="http://github.com/ttencate/tis" style="color:inherit">Tis</a></b>: 4 kB of JavaScript<br><br>' +
-                  'Left/right: move | Z/X: rotate<br>' +
+                  'Left/right: move | Shift/Ctrl: rotate<br>' +
                   'Down/up: soft/hard drop | M: music | Esc: quit' +
                 divEnd +
                 divStyleMargin + '0 20px;float:right;width:80px;color:#eee;font-size:15px">' +
@@ -297,16 +297,15 @@
               }
               if (tmp2 == 38) {
                 // Up: hard drop
-                if (keysPressed[tmp2]) break;
-                while (tryMove(currentX, currentY + 1, currentRotation));
-                lockTimer = 9;
+                if (!keysPressed[tmp2]) {
+                  while (tryMove(currentX, currentY + 1, currentRotation));
+                  lockTimer = 9;
+                }
               }
-              if (
-                  (tmp4 = (tmp2 == 90 || tmp2 == 186)) || // Z or ; (dvorak)
-                  tmp2 == 88 || tmp2 == 81) { // X or Q (dvorak)
+              if (tmp2 == 16 || tmp2 == 17) {
                 // Rotate
                 // -1 for left, 1 for right
-                tmp4 = 1 - 2*tmp4;
+                tmp4 = 1 - 2 * (tmp2 == 17);
                 if (!keysPressed[tmp2]) {
                   for (i = 0; i < 5; i++) {
                     tmp = (currentTetromino == 1 ? wallKickTableI : wallKickTableRest)[charCodeAt](((currentRotation + 4 + (tmp4-1)/2))%4 * 5 + i) - 32;
