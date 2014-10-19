@@ -322,7 +322,7 @@
                   for (i = 0; i < 5; i++) {
                     tmp = (currentTetromino == 1 ? wallKickTableI : wallKickTableRest)[charCodeAt](((currentRotation + 4 + (tmp4-1)/2))%4 * 5 + i) - 32;
                     if (tryMove(currentX + tmp4 * ((tmp & 7) - 2), currentY + tmp4 * (2 - (tmp >> 3)), (currentRotation+4+tmp4) % 4)) {
-                      playSoundEffect(100, 50, 2e-3);
+                      playSoundEffect(80, 60, .0015);
                       break;
                     }
                   }
