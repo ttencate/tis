@@ -10,15 +10,17 @@ then be invoked as an easter egg using the Konami code.
 Features
 --------
 
-- All seven tetrominos.
-- Movement and rotation.
+- All seven tetromino shapes.
+- Block movement and rotation.
+- Key repeats.
+- Soft and hard drop.
 - Line clearing.
-- Look-ahead to the upcoming tetromino.
+- Look-ahead to the upcoming block.
 - Wall kicks.
 - Levels, with corresponding speed increase.
 - Score, depending on level and number of lines cleared at once.
 - Sound effects.
-- Music.
+- Three-voice music.
 
 Missing features
 ----------------
