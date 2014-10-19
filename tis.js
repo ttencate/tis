@@ -167,9 +167,10 @@ document.addEventListener('DOMContentLoaded', function() {
       tmp3 = music[delta][charCodeAt](j) - (delta == 2 ? 64 : 32);
       // 2 * pi * 55 Hz / 22050 Hz = 0.0156723443
       x = .0157 * math.pow(2, (tmp3 % 24 + (delta == 2 ? 0 : 27)) / 12);
-      tmp2 = [.2, .1, .1][delta];
+      tmp2 = [15, 9, 9][delta];
       for (y = 0; y < 4593 * [1, 3, 2, 4][math.floor(tmp3 / 24)]; y++) {
-        tmp[i++] += 127 * ((delta == 0) + tmp2 * (math.sin(y * x) > 0 ? 1 : -1));
+        // This works because we don't have the amplitude to reach sample value 0.
+        tmp[i++] = (tmp[i] || 127) + tmp2 * (math.sin(y * x) > 0 ? 1 : -1);
         tmp2 *= 0.9999;
       }
     }
