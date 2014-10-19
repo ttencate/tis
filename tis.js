@@ -192,9 +192,7 @@
             }
           }
         }
-        // TODO https://developer.mozilla.org/en/docs/Web/API/HTMLAudioElement syntax
-        music = doc[createElement]('audio');
-        music.src = URL.createObjectURL(new Blob([tmp], {type: 'audio/wav'}));
+        music = new Audio(URL.createObjectURL(new Blob([tmp], {type: 'audio/wav'})));
         music.loop = 1;
         if (location.hash != '#m') music.play();
 
