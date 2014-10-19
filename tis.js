@@ -117,34 +117,35 @@
 
             i, j, x, y, tmp, tmp2, tmp3, tmp4,
 
+            divStyle = '<div style="',
             divEnd = '</div>',
 
             html =
-              '<div style="position:fixed;width:360px;left:50%;top:50%;margin:-270px -180px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px">' +
-                '<div style="margin:20px 40px;font-size:80%;color:#888">' +
+              divStyle + 'position:fixed;width:360px;left:50%;top:50%;margin:-270px -180px;background:rgba(0,0,0,0.8);box-shadow:0 0 30px #000;border-radius:30px">' +
+                divStyle + 'margin:20px 40px;font-size:80%;color:#888">' +
                   '<b><a href="http://github.com/ttencate/tis" style="color:inherit">Tis</a></b>: 4 kB of JavaScript<br><br>' +
                   'Left/right: move | Z/X: rotate<br>' +
                   'Down/up: soft/hard drop | M: music | Esc: quit' +
                 divEnd +
-                '<div style="float:right;margin:0 20px;width:80px;color:#eee;font:15px sans-serif">' +
+                divStyle + 'float:right;margin:0 20px;width:80px;color:#eee;font:15px sans-serif">' +
                   '<div id="tis-status">' + divEnd +
-                  'Next<div style="margin:8px 0;height:40px;box-shadow:0 0 9px #000;">'
+                  'Next' + divStyle + 'margin:8px 0;height:40px;box-shadow:0 0 9px #000;">'
             ;
 
-        tmp2 = '" style="width:20px;height:20px;float:left;box-shadow:-2px -2px 8px rgba(0,0,0,0.4) inset, 0 0 2px #000 inset;">' + divEnd;
+        tmp2 = divStyle + 'width:20px;height:20px;float:left;box-shadow:-2px -2px 8px rgba(0,0,0,0.4) inset, 0 0 2px #000 inset;" id="tis-';
         for (i = 220; i < s; i++) {
           if (i % w < 4) {
-            html += '<div id="tis-' + i + tmp2;
+            html += tmp2 + i + '">' + divEnd;
           }
         }
         html +=   divEnd +
                 divEnd +
-                '<div style="background:#000;width:200px;height:400px;box-shadow:0 0 9px #222;margin:0 40px 40px">';
+                divStyle + 'background:#000;width:200px;height:400px;box-shadow:0 0 9px #222;margin:0 40px 40px">';
 
         for (i = 0; i < s; i++) {
           grid.push(0);
           if (i > 19 && i < 220) {
-            html += '<div id="tis-' + i + tmp2;
+            html += tmp2 + i + '">' + divEnd;
           }
         }
 
@@ -228,7 +229,7 @@
             }
           }
           currentY = tmp;
-          tmp = '<div style="text-align:right;font-size:150%">';
+          tmp = divStyle + 'text-align:right;font-size:150%">';
           doc[getElementById]('tis-status').innerHTML = 'Score' + tmp + score + divEnd + 'Lines' + tmp + lines + divEnd + 'Level' + tmp + level + divEnd;
         }
 
