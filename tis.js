@@ -58,15 +58,7 @@
             // bits 0-3: fade-out speed (0 slowest, 15 fastest)
             // bits 4-9: period 2
             // bits 10-11: period 1
-            sounds = [
-              8303, // [8, 6, 15], // rotate
-              31445, // [30, 45, 5], // lock
-              8392, // [8, 6, 8], // clear 1
-              8260, // [8, 4, 4], // clear 2
-              8242, // [8, 3, 2], // clear 3
-              8225, // [8, 2, 1], // clear 4
-              31360 // [30, 40, 0], // game over
-            ],
+            sounds = [],
 
             // First 2 invisible lines, then 20 visible lines, then 2 for the Next display.
             grid = [],
@@ -130,7 +122,7 @@
             keysPressed = [],
             lastFrame,
 
-            i, j, x, y, tmp, tmp3, tmp4,
+            i, j, x, y, tmp, tmp3, tmp4, tmp5,
 
             divStyleMargin = '<div style="margin:',
             divEnd = '</div>',
@@ -197,21 +189,22 @@
         music.play();
         music.loop = 1;
 
-        for (i in sounds) {
-          tmp4 = sounds[i];
-          tmp = new Uint8Array(9e3);
-          tmp2 = 50;
-          tmp3 = tmp4 >> 10;
-          for (j in tmp) {
-            if (j > 1e3) tmp3 = (tmp4 >> 4) & 63;
-            tmp[j] = 127 + (tmp2 *= 1 - 1e-4*(tmp4&15)) * (j/10%tmp3 < tmp3 / 2 ? -1 : 1);
+        function playSoundEffect(encoding) {
+          if (!(tmp5 = sounds[encoding])) {
+            tmp5 = new Uint8Array(9e3);
+            tmp4 = 50; // amplitude
+            tmp3 = encoding >> 10; // period
+            for (j in tmp5) {
+              if (j > 1e3) tmp3 = (encoding >> 4) & 63;
+              tmp5[j] = 127 + (tmp4 *= 1 - 1e-4*(encoding&15)) * (j/10%tmp3 < tmp3 / 2 ? -1 : 1);
+            }
+            tmp5 = sounds[i] = makeAudio(tmp5);
           }
-          tmp = makeAudio(tmp);
-          sounds[i] = tmp.play.bind(tmp);
+          tmp5.play();
         }
 
-        function makeAudio(wavArray, loop) {
-          tmp = wavArray.length;
+        function makeAudio(wavArray) {
+          tmp5 = wavArray.length;
           // https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
           //
           // wavArray.set([
@@ -235,7 +228,7 @@
             'RIFF',
             // Assuming that this will be stored in little-endian.
             // It's actually platform-specific...
-            new Uint32Array([tmp + 36, 0x45564157, 0x20746d66, 16, 65537, 22050, 22050, 524289, 0x61746164, tmp]),
+            new Uint32Array([tmp5 + 36, 0x45564157, 0x20746d66, 16, 65537, 22050, 22050, 524289, 0x61746164, tmp5]),
             wavArray
           ], {type: 'audio/wav'})));
         }
@@ -314,6 +307,7 @@
             // Handle keyboard input
             for (tmp2 in keysPressed) {
               if (tmp2 == 27) { // Quit
+                // TODO: cannot quit after game over
                 doc.body.removeChild(html);
                 doc[removeEventListener](keydown, onKeyDown);
                 doc[removeEventListener](keyup, onKeyUp);
@@ -342,7 +336,7 @@
                   for (i = 0; i < 5;) {
                     tmp = (currentTetromino == 1 ? wallKickTableI : wallKickTableRest)[charCodeAt](((currentRotation + 4 + (tmp4-1)/2))%4 * 5 + i++) - 32;
                     if (tryMove(currentX + tmp4 * ((tmp & 7) - 2), currentY + tmp4 * (2 - (tmp >> 3)), (currentRotation+4+tmp4) % 4)) {
-                      sounds[0]();
+                      playSoundEffect(8303);
                       break;
                     }
                   }
@@ -361,7 +355,7 @@
             }
 
             if (lockTimer > 1) {
-              if (currentTetromino) sounds[1]();
+              if (currentTetromino) playSoundEffect(31445);
 
               // Lock it in place; we assume that the render was just done
               for (i in grid) grid[i] = shadowGrid[i];
@@ -380,7 +374,7 @@
                 tmp2++;
                 stateTime = 6;
               }
-              if (tmp2) sounds[1+tmp2]();
+              if (tmp2) playSoundEffect([, 8392, 8260, 8242, 8225][tmp2]);
               score += 100 * [0, 1, 3, 5, 8][tmp2] * level;
               lines += tmp2;
               level = 1 + ~~(lines / 10);
@@ -404,7 +398,7 @@
                 currentTetromino = 0;
                 state = 2;
                 stateTime = 4*h;
-                sounds[6]();
+                playSoundEffect(31360);
               }
             }
             lockTimer += delta;
