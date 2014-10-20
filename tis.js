@@ -131,7 +131,7 @@
             html =
               divStyleMargin + '-14pc -10pc;position:fixed;width:20pc;left:50%;top:50%;font:12px Arial;background:rgba(0,0,0,.8);box-shadow:0 0 2pc #000;border-radius:1pc">' +
                 divStyleMargin + '1pc 2pc;color:#888">' +
-                  '<b><a href="http://github.com/ttencate/tis" style="color:inherit">Tis</a></b>: Tetris in 4 kB of JavaScript<br><br>' +
+                  '<b><a href="http://github.com/ttencate/tis" style="color:inherit">Tis</a></b>: Tetris clone in just 4 kB of JavaScript<br><br>' +
                   'Left/right: move | Up/Ctrl/Alt: rotate | Esc: quit<br>' +
                   'Down/space: soft/hard drop | M: music' +
                 divEnd +
