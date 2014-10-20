@@ -18,6 +18,7 @@ Tis has nearly all of the features you might expect from a modern Tetris:
 - Block movement and rotation.
 - Key repeats.
 - Soft and hard drop.
+- Ghost piece.
 - Lock delay.
 - Bag-of-seven random generator.
 - Animated line clearing.
