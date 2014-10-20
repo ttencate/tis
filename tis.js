@@ -138,7 +138,7 @@
                 divEnd +
                 divStyleMargin + '0 1pc;float:right;color:#eee;font-size:1pc">' +
                   '<div id="tis-status">' + divEnd +
-                  'Next' + divStyleMargin + '8px 0;width:4pc;height:2pc' + boxShadow + '0 0 9px #000">'
+                  'Next' + divStyleMargin + '8px 0;width:4pc">'
             ;
 
         tmp2 = divStyleMargin + '0;width:1pc;height:1pc;float:left' + boxShadow + '-2px -2px 8px rgba(0,0,0,.4) inset,0 0 2px #000 inset" id="tis-';
@@ -149,7 +149,7 @@
         }
         html +=   divEnd +
                 divEnd +
-                divStyleMargin + '0 2pc 2pc;background:#000;width:10pc;height:20pc' + boxShadow + '0 0 9px #222">';
+                divStyleMargin + '0 2pc 2pc;background:#000;width:10pc;height:20pc">';
 
         for (i = 0; i < s; i++) {
           grid.push(0);
