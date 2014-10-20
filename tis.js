@@ -55,14 +55,17 @@
               'LSOSLSOSKSNSKSNSLSOSLSOSKSNSKSNS'
             ],
 
+            // bits 0-3: fade-out speed (0 slowest, 15 fastest)
+            // bits 4-9: period 2
+            // bits 10-11: period 1
             sounds = [
-              [8, 6, 15], // rotate
-              [30, 45, 5], // lock
-              [8, 8, 10], // clear 1
-              [8, 4, 5], // clear 2
-              [8, 3, 2], // clear 3
-              [8, 2, 1], // clear 4
-              [30, 40, 0], // game over
+              8303, // [8, 6, 15], // rotate
+              31445, // [30, 45, 5], // lock
+              8392, // [8, 6, 8], // clear 1
+              8260, // [8, 4, 4], // clear 2
+              8242, // [8, 3, 2], // clear 3
+              8225, // [8, 2, 1], // clear 4
+              31360 // [30, 40, 0], // game over
             ],
 
             // First 2 invisible lines, then 20 visible lines, then 2 for the Next display.
@@ -198,10 +201,10 @@
           tmp4 = sounds[i];
           tmp = new Uint8Array(9e3);
           tmp2 = 50;
-          tmp3 = tmp4[0];
+          tmp3 = tmp4 >> 10;
           for (j in tmp) {
-            if (j > 1e3) tmp3 = tmp4[1];
-            tmp[j] = 127 + (tmp2 *= 1-1e-4*tmp4[2]) * (j/10%tmp3 < tmp3 / 2 ? -1 : 1);
+            if (j > 1e3) tmp3 = (tmp4 >> 4) & 63;
+            tmp[j] = 127 + (tmp2 *= 1 - 1e-4*(tmp4&15)) * (j/10%tmp3 < tmp3 / 2 ? -1 : 1);
           }
           tmp = makeAudio(tmp);
           sounds[i] = tmp.play.bind(tmp);
