@@ -11,11 +11,12 @@
       keydown = 'keydown',
 
       nextCodeChar = 0,
-      tmp2 = 27;
+      state; // 0|undefined=QUIT, 1=CLEARING, 2=LOST, 3=PLAYING
 
   doc[addEventListener](keydown, function(e) {
     nextCodeChar = e[keyCode] == "&&((%'%'BA"[charCodeAt](nextCodeChar) ? nextCodeChar + 1 : 0;
-    if (tmp2 == 27 && nextCodeChar > 9) {
+    if (!state && nextCodeChar > 9) {
+      state = 3;
       (function() {
         var
             win = window,
@@ -108,7 +109,6 @@
             currentY,
             currentRotation,
 
-            state = 0, // 0=PLAYING, 1=CLEARING, 2=LOST
             stateTime,
             linesClearing,
 
@@ -122,7 +122,7 @@
             keysPressed = [],
             lastFrame,
 
-            i, j, x, y, tmp, tmp3, tmp4, tmp5,
+            i, j, x, y, tmp, tmp2, tmp3, tmp4, tmp5,
 
             divStyleMargin = '<div style="margin:',
             divEnd = '</div>',
@@ -284,6 +284,7 @@
         }
 
         function frame(now) {
+          if (!state) return;
           delta = (now - lastFrame) / 1e3 || 0;
           if (delta > .1) delta = .1;
           lastFrame = now;
@@ -301,20 +302,12 @@
                   grid[i] = grid[i-w];
                 }
               }
-              state = 0;
+              state = 3;
             }
             render();
-          } else { // state == 0: Regular gameplay
+          } else { // state == 3: Regular gameplay
             // Handle keyboard input
             for (tmp2 in keysPressed) {
-              if (tmp2 == 27) { // Quit
-                // TODO: cannot quit after game over
-                doc.body.removeChild(html);
-                doc[removeEventListener](keydown, onKeyDown);
-                doc[removeEventListener](keyup, onKeyUp);
-                music.pause();
-                return;
-              }
               if (tmp2 == 37 || tmp2 == 39) {
                 // Move
                 if (keysPressed[tmp2] >= 0) {
@@ -413,6 +406,13 @@
           tmp = e[keyCode];
           if (tmp == 77) {
             music[music.paused ? 'play' : 'pause']();
+          }
+          if (tmp == 27) { // Quit
+            doc.body.removeChild(html);
+            doc[removeEventListener](keydown, onKeyDown);
+            doc[removeEventListener](keyup, onKeyUp);
+            music.pause();
+            state = 0;
           }
           keysPressed[tmp] = keysPressed[tmp] || 0;
           if ([17, 18, 27, 37, 38, 39, 40, 77].indexOf(tmp) >= 0) {
