@@ -193,9 +193,8 @@
           if (!(tmp5 = sounds[encoding])) {
             tmp5 = new Uint8Array(9e3);
             tmp4 = 50; // amplitude
-            tmp3 = encoding >> 10; // period
             for (j in tmp5) {
-              if (j > 1e3) tmp3 = (encoding >> 4) & 63;
+              tmp3 = j > 1e3 ? (encoding >> 4) & 63 : encoding >> 10; // period
               tmp5[j] = 127 + (tmp4 *= 1 - 1e-4*(encoding&15)) * (j/10%tmp3 < tmp3 / 2 ? -1 : 1);
             }
             tmp5 = sounds[i] = makeAudio(tmp5);
