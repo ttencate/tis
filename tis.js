@@ -185,7 +185,7 @@
             }
           }
         }
-        music = makeAudio(tmp, 1);
+        music = makeAudio(tmp);
         music.play();
         music.loop = 1;
 
