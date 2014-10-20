@@ -55,6 +55,16 @@
               'LSOSLSOSKSNSKSNSLSOSLSOSKSNSKSNS'
             ],
 
+            sounds = [
+              [80, 60, .0015], // rotate
+              [300, 450, .0005], // lock
+              [80, 80, .001], // clear 1
+              [80, 40, .0005], // clear 2
+              [80, 30, .0002], // clear 3
+              [80, 20, .0001], // clear 4
+              [300, 400, 0], // game over
+            ],
+
             // First 2 invisible lines, then 20 visible lines, then 2 for the Next display.
             grid = [],
             shadowGrid = [],
@@ -117,7 +127,7 @@
             keysPressed = [],
             lastFrame,
 
-            i, j, x, y, tmp, tmp3, tmp4, tmp5,
+            i, j, x, y, tmp, tmp3, tmp4,
 
             divStyleMargin = '<div style="margin:',
             divEnd = '</div>',
@@ -181,15 +191,28 @@
           }
         }
         music = makeAudio(tmp);
+        music.play();
         music.loop = 1;
 
+        for (i in sounds) {
+          tmp4 = sounds[i];
+          tmp = new Uint8Array(9e3);
+          tmp2 = 50;
+          tmp3 = tmp4[0];
+          for (j in tmp) {
+            if (j > 1e3) tmp3 = tmp4[1];
+            tmp[j] = 127 + (tmp2 *= 1-tmp4[2]) * (j%tmp3 < tmp3 / 2 ? -1 : 1);
+          }
+          sounds[i] = makeAudio(tmp);
+        }
+
         function makeAudio(wavArray) {
-          tmp5 = wavArray.length;
+          tmp = wavArray.length;
           // https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
           //
           // wavArray.set([
           //   0x52, 0x49, 0x46, 0x46, // "RIFF"
-          //   (tmp5 + 36) & 0xff, ((tmp5 + 36) >> 8) & 0xff, ((tmp5 + 36) >> 16), 0, // data size + 36 (little-endian)
+          //   (tmp + 36) & 0xff, ((tmp + 36) >> 8) & 0xff, ((tmp + 36) >> 16), 0, // data size + 36 (little-endian)
           //   0x57, 0x41, 0x56, 0x45, // "WAVE"
           //
           //   0x66, 0x6d, 0x74, 0x20, // "fmt "
@@ -202,27 +225,15 @@
           //   8, 0, // bits per sample
           //
           //   0x64, 0x61, 0x74, 0x61, // "data"
-          //   tmp5 & 0xFF, (tmp5 >> 8) & 0xff, tmp5 >> 16, 0 // data size
+          //   tmp & 0xFF, (tmp >> 8) & 0xff, tmp >> 16, 0 // data size
           // ]);
-          tmp5 = new Audio(URL.createObjectURL(new Blob([
+          return new Audio(URL.createObjectURL(new Blob([
             'RIFF',
             // Assuming that this will be stored in little-endian.
             // It's actually platform-specific...
-            new Uint32Array([tmp5 + 36, 0x45564157, 0x20746d66, 16, 65537, 22050, 22050, 524289, 0x61746164, tmp5]),
+            new Uint32Array([tmp + 36, 0x45564157, 0x20746d66, 16, 65537, 22050, 22050, 524289, 0x61746164, tmp]),
             wavArray
           ], {type: 'audio/wav'})));
-          tmp5.play();
-          return tmp5;
-        }
-
-        function playSoundEffect(interval1, interval2, falloff) {
-          tmp5 = new Uint8Array(9e3);
-          j = 50;
-          for (i in tmp5) {
-            if (i > 1e3) interval1 = interval2;
-            tmp5[i] = 127 + (j *= 1-falloff) * (i%interval1 < interval1 / 2 ? -1 : 1);
-          }
-          makeAudio(tmp5, 1);
         }
 
         function isSolidAt(x, y, rotation, tetromino) {
@@ -327,7 +338,7 @@
                   for (i = 0; i < 5;) {
                     tmp = (currentTetromino == 1 ? wallKickTableI : wallKickTableRest)[charCodeAt](((currentRotation + 4 + (tmp4-1)/2))%4 * 5 + i++) - 32;
                     if (tryMove(currentX + tmp4 * ((tmp & 7) - 2), currentY + tmp4 * (2 - (tmp >> 3)), (currentRotation+4+tmp4) % 4)) {
-                      playSoundEffect(80, 60, .0015);
+                      sounds[0].play();
                       break;
                     }
                   }
@@ -346,7 +357,7 @@
             }
 
             if (lockTimer > 1) {
-              if (currentTetromino) playSoundEffect(300, 450, .0005);
+              if (currentTetromino) sounds[1].play();
 
               // Lock it in place; we assume that the render was just done
               for (i in grid) grid[i] = shadowGrid[i];
@@ -365,7 +376,7 @@
                 tmp2++;
                 stateTime = 6;
               }
-              if (tmp2) playSoundEffect(80, 80/tmp2, .001/tmp2);
+              if (tmp2) sounds[1+tmp2].play();
               score += 100 * [0, 1, 3, 5, 8][tmp2] * level;
               lines += tmp2;
               level = 1 + ~~(lines / 10);
@@ -389,7 +400,7 @@
                 currentTetromino = 0;
                 state = 2;
                 stateTime = 4*h;
-                playSoundEffect(300, 400, 0);
+                sounds[6].play();
               }
             }
             lockTimer += delta;
