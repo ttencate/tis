@@ -126,11 +126,10 @@
 
             divStyleMargin = '<div style="margin:',
             divEnd = '</div>',
-            boxShadow = ';box-shadow:',
 
             // 1pc = 16px
             html =
-              divStyleMargin + '-14pc -10pc;position:fixed;width:20pc;left:50%;top:50%;font:12px Arial;background:rgba(0,0,0,.8)' + boxShadow + '0 0 2pc #000;border-radius:1pc">' +
+              divStyleMargin + '-14pc -10pc;position:fixed;width:20pc;left:50%;top:50%;font:12px Arial;background:rgba(0,0,0,.8);box-shadow:0 0 2pc #000;border-radius:1pc">' +
                 divStyleMargin + '1pc 2pc;color:#888">' +
                   '<b><a href="http://github.com/ttencate/tis" style="color:inherit">Tis</a></b>: Tetris in 4 kB of JavaScript<br><br>' +
                   'Left/right: move | Up/Ctrl/Alt: rotate | Esc: quit<br>' +
@@ -141,7 +140,7 @@
                   'Next' + divStyleMargin + '8px 0;width:4pc">'
             ;
 
-        tmp2 = divStyleMargin + '0;width:1pc;height:1pc;float:left' + boxShadow + '-2px -2px 8px rgba(0,0,0,.4) inset,0 0 2px #000 inset" id="tis-';
+        tmp2 = divStyleMargin + '0;width:1pc;height:1pc;float:left;box-shadow:-2px -2px 8px rgba(0,0,0,.4) inset,0 0 2px #000 inset" id="tis-';
         for (i = 220; i < s; i++) {
           if (i % w < 4) {
             html += tmp2 + i + '">' + divEnd;
