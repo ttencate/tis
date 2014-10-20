@@ -199,6 +199,8 @@
               tmp5[j] = 127 + (tmp4 *= 1 - 1e-4*(encoding&15)) * (j/10%tmp3 < tmp3 / 2 ? -1 : 1);
             }
             tmp5 = sounds[i] = makeAudio(tmp5);
+          } else {
+            tmp5.currentTime = 0;
           }
           tmp5.play();
         }
