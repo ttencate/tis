@@ -56,13 +56,13 @@
             ],
 
             sounds = [
-              [80, 60, .0015], // rotate
-              [300, 450, .0005], // lock
-              [80, 80, .001], // clear 1
-              [80, 40, .0005], // clear 2
-              [80, 30, .0002], // clear 3
-              [80, 20, .0001], // clear 4
-              [300, 400, 0], // game over
+              [8, 6, 15], // rotate
+              [30, 45, 5], // lock
+              [8, 8, 10], // clear 1
+              [8, 4, 5], // clear 2
+              [8, 3, 2], // clear 3
+              [8, 2, 1], // clear 4
+              [30, 40, 0], // game over
             ],
 
             // First 2 invisible lines, then 20 visible lines, then 2 for the Next display.
@@ -190,7 +190,7 @@
             }
           }
         }
-        music = makeAudio(tmp);
+        music = makeAudio(tmp, 1);
         music.play();
         music.loop = 1;
 
@@ -201,12 +201,13 @@
           tmp3 = tmp4[0];
           for (j in tmp) {
             if (j > 1e3) tmp3 = tmp4[1];
-            tmp[j] = 127 + (tmp2 *= 1-tmp4[2]) * (j%tmp3 < tmp3 / 2 ? -1 : 1);
+            tmp[j] = 127 + (tmp2 *= 1-1e-4*tmp4[2]) * (j/10%tmp3 < tmp3 / 2 ? -1 : 1);
           }
-          sounds[i] = makeAudio(tmp);
+          tmp = makeAudio(tmp);
+          sounds[i] = tmp.play.bind(tmp);
         }
 
-        function makeAudio(wavArray) {
+        function makeAudio(wavArray, loop) {
           tmp = wavArray.length;
           // https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
           //
@@ -338,7 +339,7 @@
                   for (i = 0; i < 5;) {
                     tmp = (currentTetromino == 1 ? wallKickTableI : wallKickTableRest)[charCodeAt](((currentRotation + 4 + (tmp4-1)/2))%4 * 5 + i++) - 32;
                     if (tryMove(currentX + tmp4 * ((tmp & 7) - 2), currentY + tmp4 * (2 - (tmp >> 3)), (currentRotation+4+tmp4) % 4)) {
-                      sounds[0].play();
+                      sounds[0]();
                       break;
                     }
                   }
@@ -357,7 +358,7 @@
             }
 
             if (lockTimer > 1) {
-              if (currentTetromino) sounds[1].play();
+              if (currentTetromino) sounds[1]();
 
               // Lock it in place; we assume that the render was just done
               for (i in grid) grid[i] = shadowGrid[i];
@@ -376,7 +377,7 @@
                 tmp2++;
                 stateTime = 6;
               }
-              if (tmp2) sounds[1+tmp2].play();
+              if (tmp2) sounds[1+tmp2]();
               score += 100 * [0, 1, 3, 5, 8][tmp2] * level;
               lines += tmp2;
               level = 1 + ~~(lines / 10);
@@ -400,7 +401,7 @@
                 currentTetromino = 0;
                 state = 2;
                 stateTime = 4*h;
-                sounds[6].play();
+                sounds[6]();
               }
             }
             lockTimer += delta;
