@@ -113,7 +113,7 @@
 
             delta,
             gravityTimer, // between 0 and 1
-            lockTimer = 0,
+            lockTimer = 2,
             keysPressed = [],
             lastFrame,
 
@@ -127,8 +127,8 @@
               divStyleMargin + '-270px -180px;position:fixed;width:360px;left:50%;top:50%;font:13px sans-serif;background:rgba(0,0,0,.8)' + boxShadow + '0 0 30px #000;border-radius:30px">' +
                 divStyleMargin + '20px 40px;color:#888">' +
                   '<b><a href="http://github.com/ttencate/tis" style="color:inherit">Tis</a></b>: Tetris in 4 kB of JavaScript<br><br>' +
-                  'Left/right: move | Shift/Ctrl: rotate<br>' +
-                  'Down/up: soft/hard drop | M: music | Esc: quit' +
+                  'Left/right: move | Up/Ctrl/Alt: rotate | Esc: quit<br>' +
+                  'Down/space: soft/hard drop | M: music' +
                 divEnd +
                 divStyleMargin + '0 20px;float:right;width:80px;color:#eee;font-size:15px">' +
                   '<div id="tis-status">' + divEnd +
@@ -312,14 +312,14 @@
                   tryMove(currentX + 1 - 2 * (tmp2 == 37), currentY, currentRotation);
                 }
               }
-              if (tmp2 == 38) {
-                // Up: hard drop
+              if (tmp2 == 32) {
+                // Space: hard drop
                 if (!keysPressed[tmp2]) {
                   while (tryMove(currentX, currentY + 1, currentRotation));
                   lockTimer = 9;
                 }
               }
-              if (tmp2 == 16 || tmp2 == 17) {
+              if (tmp2 == 38 || tmp2 == 18 || tmp2 == 17) {
                 // Rotate
                 // -1 for left, 1 for right
                 tmp4 = 1 - 2 * (tmp2 == 17);
@@ -345,7 +345,7 @@
               tryMove(currentX, currentY + 1, currentRotation);
             }
 
-            if (!currentTetromino || lockTimer > 1) {
+            if (lockTimer > 1) {
               if (currentTetromino) playSoundEffect(300, 450, .0005);
 
               // Lock it in place; we assume that the render was just done
@@ -361,9 +361,8 @@
                     continue rowNotFull;
                   }
                 }
-                linesClearing[y] = 1;
+                linesClearing[y] = state = 1;
                 tmp2++;
-                state = 1;
                 stateTime = 6;
               }
               if (tmp2) playSoundEffect(80, 80/tmp2, .001/tmp2);
@@ -403,14 +402,10 @@
         function onKeyDown(e) {
           tmp = e[keyCode];
           if (tmp == 77) {
-            if (music.paused) music.play(); else music.pause();  
+            music[music.paused ? 'play' : 'pause']();
           }
-          if (!keysPressed[tmp]) {
-            keysPressed[tmp] = 0;
-          }
-          // 37-40: arrow keys
-          // 81, 88, 90, 186: rotation keys
-          if (tmp > 36 && tmp < 41 || tmp == 81 || tmp == 88 || tmp == 90 || tmp == 186) {
+          keysPressed[tmp] = keysPressed[tmp] || 0;
+          if ([17, 18, 27, 37, 38, 39, 40, 77].indexOf(tmp) >= 0) {
             e.preventDefault();
           }
         }
