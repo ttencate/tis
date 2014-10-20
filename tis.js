@@ -128,19 +128,20 @@
             divEnd = '</div>',
             boxShadow = ';box-shadow:',
 
+            // 1pc = 16px
             html =
-              divStyleMargin + '-270px -180px;position:fixed;width:360px;left:50%;top:50%;font:13px Arial;background:rgba(0,0,0,.8)' + boxShadow + '0 0 30px #000;border-radius:30px">' +
-                divStyleMargin + '20px 40px;color:#888">' +
+              divStyleMargin + '-14pc -10pc;position:fixed;width:20pc;left:50%;top:50%;font:12px Arial;background:rgba(0,0,0,.8)' + boxShadow + '0 0 2pc #000;border-radius:1pc">' +
+                divStyleMargin + '1pc 2pc;color:#888">' +
                   '<b><a href="http://github.com/ttencate/tis" style="color:inherit">Tis</a></b>: Tetris in 4 kB of JavaScript<br><br>' +
                   'Left/right: move | Up/Ctrl/Alt: rotate | Esc: quit<br>' +
                   'Down/space: soft/hard drop | M: music' +
                 divEnd +
-                divStyleMargin + '0 20px;float:right;width:80px;color:#eee;font-size:15px">' +
+                divStyleMargin + '0 1pc;float:right;color:#eee;font-size:1pc">' +
                   '<div id="tis-status">' + divEnd +
-                  'Next' + divStyleMargin + '8px 0;height:40px' + boxShadow + '0 0 9px #000">'
+                  'Next' + divStyleMargin + '8px 0;width:4pc;height:2pc' + boxShadow + '0 0 9px #000">'
             ;
 
-        tmp2 = divStyleMargin + '0;width:20px;height:20px;float:left' + boxShadow + '-2px -2px 8px rgba(0,0,0,.4) inset,0 0 2px #000 inset" id="tis-';
+        tmp2 = divStyleMargin + '0;width:1pc;height:1pc;float:left' + boxShadow + '-2px -2px 8px rgba(0,0,0,.4) inset,0 0 2px #000 inset" id="tis-';
         for (i = 220; i < s; i++) {
           if (i % w < 4) {
             html += tmp2 + i + '">' + divEnd;
@@ -148,7 +149,7 @@
         }
         html +=   divEnd +
                 divEnd +
-                divStyleMargin + '0 40px 40px;background:#000;width:200px;height:400px' + boxShadow + '0 0 9px #222">';
+                divStyleMargin + '0 2pc 2pc;background:#000;width:10pc;height:20pc' + boxShadow + '0 0 9px #222">';
 
         for (i = 0; i < s; i++) {
           grid.push(0);
