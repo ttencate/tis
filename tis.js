@@ -27,6 +27,7 @@
 
             math = Math,
 
+            baseBass = 'LSOSLSOSKSNSKSNS',
             music = [
               // http://www.theoreticallycorrect.com/Helmholtz-Pitch-Numbering/
               //
@@ -46,14 +47,14 @@
               'T$$T,+)$),Y))<$TTYTl.).1^..D,\\.,<$TTTTT`',
               // All notes are eighths.
               // Subtract 64 to get MIDI note number - 33.
-              'GNKNGNKNLSOSLSOSKSNSKSNSLSNSL@BCESOSESOSCOCOCOCOBNBN?J?J@CGL@@@@'
+              'GNKNGNKN' + baseBass + 'LSNSL@BCESOSESOSCOCOCOCOBNBN?J?J@CGL@@@@'
             ],
             thirdVerse = [
               // Treble voices
               'xtvstqpsxtvs\\`}|x',
               'tqspqqpptqspY`xx\u007f',
               // Bass voice
-              'LSOSLSOSKSNSKSNSLSOSLSOSKSNSKSNS'
+              baseBass+baseBass+baseBass+baseBass
             ],
 
             // bits 0-3: fade-out speed (0 slowest, 15 fastest)
@@ -166,7 +167,6 @@
         // Music!
         // 4593 samples/eighth * 8 eighths/bar * 24 bars = 881856 samples
         tmp = new Uint8Array(881856);
-        thirdVerse[2] += thirdVerse[2];
         // delta is voice index; note that it is a string!
         for (delta in music) {
           music[delta] += music[delta] + thirdVerse[delta];
